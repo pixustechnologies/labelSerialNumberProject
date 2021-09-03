@@ -1,5 +1,0 @@
-Weeks reset on Sunday 1am
-Year resets on The 1st of january 1am
-count up needs to be called every time something prints, include in loop.
-
-COUNT AFTER PRINT

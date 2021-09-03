@@ -1,6 +1,0 @@
-Need scannerWatch to be called on computer bootup. 
-
-LogCleaner need to be called once a year, will clear 20% of that year's barcodes, regardless of they are still being used
-
-
-setup TASK SCHEUDLAR
