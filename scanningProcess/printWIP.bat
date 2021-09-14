@@ -1,4 +1,5 @@
 @echo off
+:: takes in ORDNUM_10, PRTNUM_10, and DUEQTY_10
 set orderNum=%1
 set prtnum=%2
 set printNum=%3
@@ -27,6 +28,7 @@ if %index% leq %printNum% (
 	goto :while1
 )
 
+:: dialoge box to indicate it finished printing
 echo.
 echo Finished Printing
 echo.

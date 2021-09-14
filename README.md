@@ -11,14 +11,11 @@ Weeks reset on Sunday 1am
 Year resets on The 1st of january 1am
 count up needs to be called every time something prints, include in loop.
 
-COUNT AFTER PRINT
-
 TODO on printer computer
-https://blogs.sap.com/2016/02/10/steps-to-fetch-data-from-a-text-file-to-crystal-report-2013/
--set up database to pull the right number
-
--connect to printer
-
+- connect to printer
 - connect to network files
+- print config sheets
 
--
+IBM SQL Info
+http://www.cs.yorku.ca/~jarek/db2/embed-c.html
+https://www.ibm.com/support/producthub/db2/docs/content/SSEPGG_11.5.0/com.ibm.db2.luw.apdv.embed.doc/doc/c0020948.html
