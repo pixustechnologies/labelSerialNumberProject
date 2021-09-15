@@ -7,17 +7,6 @@ set printNum=%3
 :: the BOM
 "C:\Program Files\Visual CUT 11\Visual CUT.exe" -e "\\WATDBS01\ExactShared\Exact\RMServer\Modified Reports\SHPPAPER.rpt" "user_id:dba" "password:sql" "Parm1:%orderNum%" "Printer:\\Srv1\Small2"
 
-
-:: the configuration report
-:: \\WATNAS\Userdata\Projects\Configuration Sheets
-::for /f tokens^=* %%i in ('where .:*')do %%~nxi
-::for /f "delims=" %%F in ('where java') do set var=%%F
-for /f tokens^=* %%i in ('where \\\\WATNAS\Userdata\\Projects\\Configuration Sheets\\%prtnum%*.docx')do set var=%%~nxi 
-::printer name?
-:: also maybe just print from te \\watnas?
-print %var% /c /d:lpt1
-
-
 :: the list of serial numbers
 set /a "index = 1"
 :while1
@@ -27,6 +16,19 @@ if %index% leq %printNum% (
 	set /a "index = index + 1"
 	goto :while1
 )
+
+:: the configuration sheets
+set searchPath=\\WATNAS\Userdata\Projects\
+set foundFilePath=
+echo Searching for the Configuration Sheet...
+FOR /R "%searchPath%" %%a  in (%prtnum%*.docx) DO (
+    IF EXIST "%%~fa" (
+        echo "%%~fa" 
+        SET foundFilePath=%%~fa
+    )
+)
+echo Finished Searching
+call "C:\Program Files\Microsoft Office\root\Office16\WINWORD.EXE" "%foundFilePath%" /q /n /mFilePrintDefault /mFileExit
 
 :: dialoge box to indicate it finished printing
 echo.

@@ -148,7 +148,7 @@ error:
 }
 
 bool Contains(string data) {
-    // checks if there it is already in the system
+    // checks if the barcode is already in the system
     ifstream file("bLog.txt");
     string input;
     string barcode;
@@ -167,7 +167,7 @@ bool Contains(string data) {
 }
 
 int alreadyPrintedTimes(string data) {
-    // checks if there it is already in the system
+    // checks how many times the barcode has been printed
     ifstream file("bLog.txt");
     string input;
     string barcode;
