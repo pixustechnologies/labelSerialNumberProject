@@ -27,6 +27,7 @@ FOR /R "%searchPath%" %%a  in (%prtnum%*.docx) DO (
         SET foundFilePath=%%~fa
     )
 )
+echo "%foundFilePath%"
 echo Finished Searching
 call "C:\Program Files\Microsoft Office\root\Office16\WINWORD.EXE" "%foundFilePath%" /q /n /mFilePrintDefault /mFileExit
 
