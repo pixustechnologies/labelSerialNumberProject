@@ -1,30 +1,47 @@
 @echo off
-:: takes in ORDNUM_10, the serial number, boolean if last copy, and input specification
+:: takes in ORDNUM_10, Serial Number, Report Name, and Input Specification
 set orderNum=%1
 set serialNum=%2
-set printNum=%3
+set reportName=%3
 set inputSpec=%4
 
-::the printing
-	::C:\Program Files\Millet Software\DataLink Viewer 2011\DataLink_Viewer_2011.exe" -v "C:\temp\Report.rpt" "user_id:dba" "password:sql" "Parm1:%orderNum%" "Printer:\\Srv1\Small2"
-	::C:\Program Files\Millet Software\DataLink Viewer 2011\DataLink_Viewer_2011.exe" -v "C:\temp\Report.rpt" "user_id:dba" "password:sql" "Parm1:%orderNum%" "Printer:\\Srv1\Large1"
-	:: PRINTER NAMES UNTESTED
-	:: can move reports to local 
-"C:\Program Files\Visual CUT 11\Visual CUT.exe" -e "\\WATDBS01\ExactShared\Exact\RMServer\Modified Reports\boxLabel.rpt" "Parm1:%orderNum%" "Parm2:%serialNum%" "Printer_Only:ZDesigner LP 2844"
-"C:\Program Files\Visual CUT 11\Visual CUT.exe" -e "\\WATDBS01\ExactShared\Exact\RMServer\Modified Reports\productLabel.rpt" "Parm1:%orderNum%" "Parm2:%serialNum%" "Parm3:%inputSpec%" "Printer_Only:ZDesigner 105SL"
-
-:: QA sheet
-"C:\Program Files\Visual CUT 11\Visual CUT.exe" -e "\\WATDBS01\ExactShared\Exact\RMServer\Modified Reports\QAInspection2.2.rpt" "Parm1:%orderNum%" "Parm2:%serialNum%" "Printer_Only:\\WATERP01.pixus-tech.local\PXS-MXM363N PCL6"
-
-:: need full path of where to put the files 
-::mkdir C:\PrintedReports\%serialNum%
-:: REPRINT ALL OF THE VISUAL CUT FILES INTO THIS FOLDER
-
-:: dialoge box to indicate the printing is finished
-if %printNum% == 1 (
-	echo.
-	echo Finished Printing
-	echo.
-	PAUSE
+set folderPath=
+set searchPath="\\WATDBS01\ExactShared\Exact\RMServer\Modified Reports\"
+set foundFilePath=
+FOR /R "%searchPath%" %%a  in (%prtnum%*.docx) DO (
+    IF EXIST "%%~fa" (
+        echo "%%~fa" 
+        SET foundFilePath=%%~fa
+    )
 )
+echo "%foundFilePath%"
+set printerName=
+set exePath="C:\Program Files\Visual CUT 11\Visual CUT.exe"
+:: PRINTER NAMES UNTESTED
+if %reportName% == "01A000037-A01" (
+	set printerName=""
+) else if %reportName% == "01A000038-A01" (
+	set printerName=""
+) else if %reportName% == "01A000039-A01" (
+	set printerName=""
+) else if %reportName% == "01A000040-A01" (
+	set printerName=""
+) else if %reportName% == "01A000041-A02" (
+	set printerName="ZDesigner 105SL"
+) else if %reportName% == "01A000042-A01" (
+	set printerName=""
+) else if %reportName% == "01A000052-A01" (
+	set printerName=""
+) else if %reportName% == "01A000077-A01" (
+	set printerName=""
+) else if %reportName% == "01A000163-A01" (
+	set printerName=""
+)
+:: missing the box label still
 
+"%exePath%" -e "%foundFilePath%" "Parm1:%orderNum%" "Parm2:%serialNum%" "Parm3:%inputSpec%" "Printer_Only:%printerName%"
+"%exePath%" -e "%foundFilePath%" "Parm1:%orderNum%" "Parm2:%serialNum%" "Parm3:%inputSpec%" "Export_Format:" "Export_File:%folderPath%Label%reportName%.file"
+:: REPRINT THE VISUAL CUT FILES INTO FOLDER
+:: "Adobe Acrobat (pdf)" 
+:: (see valid export format options in the Visual CUT drop-down list for export formats). 
+:: PAGE 103

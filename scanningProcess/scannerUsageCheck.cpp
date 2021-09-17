@@ -42,11 +42,15 @@ int main(int argc, char* argv[]) {
     //     FROM    Order_Master om
     //     WHERE   :ordernum LIKE om.ORDNUM_10 
     //             AND :name = om.PRTNUM_10;
-               
+             
 
-// need another query for what labels to print
-// put all assy into list, check list to start with labeling code
-// if true, print dueQTY times
+    int timesOrderedTotal = 10;
+    int timesPrinting = 1;
+    string partNum;
+    //partNum = name;
+    //int timesPrinting = (int) dueqty;
+    //int timesOrderedTotal = (int) dueqty;  
+
     vector<string> labelReports;
     vector<float> labelQty;
     // EXEC SQL DECLARE LabelSearch CURSOR FOR 
@@ -70,17 +74,12 @@ int main(int argc, char* argv[]) {
 
 
 
-    int timesOrderedTotal = 10;
-    int timesPrinting = 1; 
-    //int timesPrinting = (int) dueqty;
-    //int timesOrderedTotal = (int) dueqty;
-
     string yesno;
-    if(inDatabase){
+    if (inDatabase) {
         cout << "Second step: \n Printing mutliple QA Sheets and Box + Product Labels \n"
              << "Revert to BOM/Config/Serial Number printing? (y/n)\n";
         cin >> yesno;
-        if(yesno == "y"){
+        if (yesno == "y") {
             inDatabase = false;
             cout << "First step: \n Printing the BOM, Configuration sheet, and multiple Serial Number Lists \n";
         } else {
@@ -103,7 +102,7 @@ int main(int argc, char* argv[]) {
         std::istringstream stream( input );
         stream >> timesPrinting;
     }
-    string s, s2, s3, s4;
+    string s;
     int startingSN = SerialNumberGet();
 
     if (inDatabase) { //if we have seen the barcode before, print labels
@@ -117,51 +116,49 @@ int main(int argc, char* argv[]) {
         }
 
         //print labels through a bat file
-        //printLabels.bat takes in ordnum, serial, code, inputspec, firstSerial
+        //printLabels.bat takes in ordnum, serial, reportname, inputspec
         updateDatabase(barcode, timesPrinting);
-        for(int i = 0; i < timesPrinting; i++){
+        for (int i = 0; i < timesPrinting; i++) {
             int serialNum = SerialNumberGet();
-            for(int j = 0; j < labelReports.size(); j++){ // prints all labels in assembly - some arnt?
+            s = "printQA.bat " + barcode + " " + to_string(serialNum);
+            system( s.c_str() );
+            for (int j = 0; j < labelReports.size(); j++) { // prints all labels in assembly - some arnt?
                 // inside of ONE notes section
-                for(int k = 0; k < labelQty[j]; k++){
+                for (int k = 0; k < labelQty[j]; k++) {
                     // take in first two tokens of label Reports and check?
                     // need standardization of this process
-                    s = "printLabels.bat " + barcode + " " + to_string(serialNum) + " " + labelReports[j] + " "  + inputSpec ;
+                    string reportName;
+                    // TAKE the string labelReports[j] delimited k times into reportName
+                    s = "printLabelsv2.bat " + barcode + " " + to_string(serialNum) + " " + reportName + " "  + inputSpec;
+                    system( s.c_str() );
                 }
             }
-            // printlabels needs to be updated
-            s = "printLabels.bat " + barcode + " " + to_string(serialNum) + " x " + inputSpec;
-            system( s.c_str() );
             s = "serialNumberCountUp.bat";
             system( s.c_str() );
         }
+        cout << "Finished printing\n";
 
-        //reprint loop for eran
+        //TODO::
         do {
             cout << "Reprint All, One, or None? (a/1/n)\n";
             cin >> yesno;
             if (yesno == "a") {
-                for(int i = 0 ; i < timesPrinting; i++){
-                    s = "printLabels.bat " + barcode + " " + to_string(startingSN + i) + " x " + inputSpec + " ";
-                    system( s.c_str() );
-                }
+                
             } else if (yesno == "1") {
-                string sn, document;
+                string sn;
                 cout << "Which Serial Number?\n";
                 cin >> sn;
-                s = "printLabels.bat " + barcode + " " + sn + " x " + inputSpec  + " ";
-                system( s.c_str() );
+
             }
+            cout << "Finished printing\n";
         } while (yesno != "n");
         
 
-    } else { // havn't seen it before, so print BOM, config, SN list
+    } else { // haven't seen it before, so print BOM, config, SN list
         if (!Contains(barcode)) {
             addDatabase(barcode, timesOrderedTotal);
         }
-        s3 = " " + to_string(timesPrinting); // print times
-        s2 = " " + to_string(timesOrderedTotal); // change to part num when mssql
-        s = "printWIP.bat " + barcode + s2 + s3;   
+        s = "printWIP.bat " + barcode + " " + partNum + " " + to_string(timesPrinting);   
         system( s.c_str() ); 
     }
     /*
