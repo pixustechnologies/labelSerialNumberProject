@@ -9,7 +9,6 @@
 // #include <sqlenv.h>
 // #include <sqlcodes.h>
 // #include <sqlca.h>
-#include <sys/time.h>
 
 using namespace std;
 
@@ -18,6 +17,7 @@ void addDatabase(string data, int orderedNum);
 void updateDatabase(string barcode, int timesPrinting);
 int SerialNumberGet();
 int alreadyPrintedTimes(string data);
+void printStageTwo(int serialNum, string barcode, vector<string> labelReports, string inputSpec);
 
 int main(int argc, char* argv[]) {   
     // starts via autohotkey
@@ -26,12 +26,14 @@ int main(int argc, char* argv[]) {
     barcode = argv[1];
     cout << barcode << endl;
 
+    // checks if the barcode is in the database already
     bool inDatabase = Contains(barcode);
 
-   
+    // queries the database to get the part name and quantity
     // EXEC SQL BEGIN DECLARE SECTION;
     //     char db[13] = "ExactMAXPixus", u[4] = "SQLR", ps[12] = "/SQ/R#3's5~.";
-    //     char ordernum[8], name[30], notes[128??];
+    //     char ordernum[8], name[30];
+    //     varchar notes[500];
     //     float dueqty;
     // EXEC SQL END DECLARE SECTION;
     // EXEC SQL CONNECT TO :db USER :u USING :ps;
@@ -43,7 +45,6 @@ int main(int argc, char* argv[]) {
     //     WHERE   :ordernum LIKE om.ORDNUM_10 
     //             AND :name = om.PRTNUM_10;
              
-
     int timesOrderedTotal = 10;
     int timesPrinting = 1;
     string partNum;
@@ -51,29 +52,30 @@ int main(int argc, char* argv[]) {
     //int timesPrinting = (int) dueqty;
     //int timesOrderedTotal = (int) dueqty;  
 
+    //now searching for the labels associated with the part name
     vector<string> labelReports;
-    vector<float> labelQty;
     // EXEC SQL DECLARE LabelSearch CURSOR FOR 
-    //     SELECT  rd.PRTNUM_11, rd.DUEQTY_11 
-    //     FROM    Requirement_Detail rd
+    //     SELECT  rd.PRTNUM_11 
+    //     FROM    Requirement_Detail rd, Windows_Notes wn, Order_Master om
     //     WHERE   :ordernum LIKE rd.ORDNUM_11
+    //             AND om.ORDNUM_10 = rd.ORDNUM_11
     //             AND :name = rd.PRTNUM_11
-    //             AND :dueqty = rd.DUEQTY_11;
-    //             AND :notes = SOME FIELD
+    //             AND :notes = wn.NOTES_61
+    //             AND wn.COMPRT_61 = rd.PRTNUM_11
+    //             AND om.PRTNUM_10 = wn.PRTNUM_61
             
-
+    // reduces full components down to just labels
     // EXEC SQL OPEN LabelSearch;
     // EXEC SQL WHENEVER NOT FOUND GO TO end;
     // for (;;) {
-    //     EXEC SQL FETCH LabelSearch INTO :name, :dueqty, :notes;
-    //     if (name == "" || name == "") {
+    //     EXEC SQL FETCH LabelSearch INTO :name, :notes;
+    //     if (name[0] == "9" && name[1] == "4" && name[2] == "A" || 
+    //     name[0] == "K" && name[1] == "9" && name[2] == "4" && name[3] == "A") {
     //         labelReports.push_back(notes);
-    //         labelQty.push_back(dueqty);
     //     }
     // };
 
-
-
+    // asks if the user would like to revert to the first stage, or continue
     string yesno;
     if (inDatabase) {
         cout << "Second step: \n Printing mutliple QA Sheets and Box + Product Labels \n"
@@ -88,11 +90,7 @@ int main(int argc, char* argv[]) {
     } else {
         cout << "First step: \n Printing the BOM, Config sheet, and multiple Serial Number Lists \n";
     }
-        //TODO:
-        // IF REPLACED, REMOVE scannerLogCleanerYearlyUpdate.cpp / yearlyLogCleanup.exe
-        // AND REMOVE THE WINDOWS TASK SCHEDUALER TASK THAT RUNS THE EXE EVERY YEAR
-        // the program is set to remove the log once the times printed equals the total times ordered
-        // OUTDATED - ask to leave in for reprinting purposes :D
+
     cout << "How many times would you like to print? [default = " << timesPrinting <<
             " ]. \n [Enter] to continue with the default, otherwise submit a new number to change\n";
     string input;
@@ -102,6 +100,8 @@ int main(int argc, char* argv[]) {
         std::istringstream stream( input );
         stream >> timesPrinting;
     }
+
+    // main logic::
     string s;
     int startingSN = SerialNumberGet();
 
@@ -114,53 +114,44 @@ int main(int argc, char* argv[]) {
             std::istringstream stream( input );
             stream >> inputSpec;
         }
-
-        //print labels through a bat file
-        //printLabels.bat takes in ordnum, serial, reportname, inputspec
+        
         updateDatabase(barcode, timesPrinting);
+        // printing all of the labels/documents per serial number, and counting up
         for (int i = 0; i < timesPrinting; i++) {
             int serialNum = SerialNumberGet();
-            s = "printQA.bat " + barcode + " " + to_string(serialNum);
-            system( s.c_str() );
-            for (int j = 0; j < labelReports.size(); j++) { // prints all labels in assembly - some arnt?
-                // inside of ONE notes section
-                for (int k = 0; k < labelQty[j]; k++) {
-                    // take in first two tokens of label Reports and check?
-                    // need standardization of this process
-                    string reportName;
-                    // TAKE the string labelReports[j] delimited k times into reportName
-                    s = "printLabelsv2.bat " + barcode + " " + to_string(serialNum) + " " + reportName + " "  + inputSpec;
-                    system( s.c_str() );
-                }
-            }
+            printStageTwo(serialNum, barcode, labelReports, inputSpec);
             s = "serialNumberCountUp.bat";
             system( s.c_str() );
         }
         cout << "Finished printing\n";
 
-        //TODO::
+        // checking if the user wishes to repeat some of the prints
         do {
             cout << "Reprint All, One, or None? (a/1/n)\n";
             cin >> yesno;
             if (yesno == "a") {
-                
+                for (int i = 0; i < timesPrinting; i++) {
+                    int serialNum = startingSN + i;
+                    printStageTwo(serialNum, barcode, labelReports, inputSpec);
+                }           
             } else if (yesno == "1") {
                 string sn;
                 cout << "Which Serial Number?\n";
                 cin >> sn;
-
+                printStageTwo(stoi(sn), barcode, labelReports, inputSpec);
             }
             cout << "Finished printing\n";
         } while (yesno != "n");
         
 
-    } else { // haven't seen it before, so print BOM, config, SN list
-        if (!Contains(barcode)) {
+    } else { // haven't seen the barcode before, so print BOM, config, SN list
+        if (!Contains(barcode)) { // *maybe they reverted, so cant assume it isnt there
             addDatabase(barcode, timesOrderedTotal);
         }
         s = "printWIP.bat " + barcode + " " + partNum + " " + to_string(timesPrinting);   
         system( s.c_str() ); 
     }
+    // closing SQL
     /*
 end:
 
@@ -184,18 +175,15 @@ error:
 bool Contains(string data) {
     // checks if the barcode is already in the system
     ifstream file("bLog.txt");
-    string input;
-    string barcode;
-    int printedTimes;
-    int numOfOrders;
+    string input, barcode;
     while(getline(file, input)){
         istringstream line(input);
         line >> barcode;
-        line >> printedTimes;
-        line >> numOfOrders;
         if (barcode == data) {
             return true;
         }
+        line >> barcode;
+        line >> barcode;
     }
     return false;
 }
@@ -203,10 +191,8 @@ bool Contains(string data) {
 int alreadyPrintedTimes(string data) {
     // checks how many times the barcode has been printed
     ifstream file("bLog.txt");
-    string input;
-    string barcode;
-    int printedTimes;
-    int numOfOrders;
+    string input, barcode;
+    int printedTimes, numOfOrders;
     while(getline(file, input)){
         istringstream line(input);
         line >> barcode;
@@ -220,7 +206,7 @@ int alreadyPrintedTimes(string data) {
 }
 
 int SerialNumberGet() {
-    // gets the serial number
+    // gets the serial number from the text file
     ifstream file("serialNumberCount.txt");
     string input;
     int serialNumber;
@@ -235,12 +221,9 @@ void updateDatabase(string data, int currentPrintedTimes) {
     // updates the database when something has been printed, removes if printed is equal to ordered
     ifstream file("bLog.txt");
     vector<string> barcodes;
-    vector<int> printNums;
-    vector<int> totalPrintNums;
-    string input;
-    string barcode;
-    int printedTimes;
-    int numOfOrders;
+    vector<int> printNums, totalPrintNums;
+    string input, barcode;
+    int printedTimes, numOfOrders;
     while(getline(file, input)){
         istringstream line(input);
         line >> barcode;
@@ -249,7 +232,7 @@ void updateDatabase(string data, int currentPrintedTimes) {
         if (barcode == (data)) {
             printedTimes += currentPrintedTimes;
         }
-        //if(printedTimes != numOfOrders){  //this prevents repeat printing which could be an issue ASK
+        //if(printedTimes != numOfOrders){  //this would prevents repeat printing 
             barcodes.push_back(barcode);
             printNums.push_back(printedTimes);
             totalPrintNums.push_back(numOfOrders);
@@ -274,4 +257,16 @@ void addDatabase(string data, int orderedNum) {
     bLog << data + s << endl;
 }
 
-
+void printStageTwo(int serialNumber, string orderNumber, vector<string> labelReports, string inputSpecification) {
+    // prints the QA sheet, and all of the labels in the respective
+    string s = "printQA.bat " + orderNumber + " " + to_string(serialNumber);
+    system( s.c_str() );
+    for (int j = 0; j < labelReports.size(); j++) { // prints all labels in assembly - some arnt?
+        string reportName;
+        istringstream iss(labelReports[j], istringstream::in);
+        while( iss >> reportName ) {
+            s = "printLabelsv2.bat " + orderNumber + " " + to_string(serialNumber) + " " + reportName + " "  + inputSpecification;
+            system( s.c_str() );
+        }
+    }
+}

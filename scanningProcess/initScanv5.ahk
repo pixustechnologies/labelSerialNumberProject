@@ -5,7 +5,7 @@ SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 #InstallKeybdHook
 
 SetBatchLines, -1 
-
+; waits for f9, then runs the program
 F9::
     input, scan,,{Enter} ;start accepting input from barcode reader
 	RunWait, logCheck.exe %scan%

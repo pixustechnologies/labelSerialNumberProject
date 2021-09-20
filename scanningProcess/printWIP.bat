@@ -7,19 +7,20 @@ set printNum=%3
 set exePath="C:\Program Files\Visual CUT 11\Visual CUT.exe"
 set reportPath="\\WATDBS01\ExactShared\Exact\RMServer\Modified Reports\"
 :: the BOM
-"%exePath%" -e "%reportPath%SHPPAPER.rpt" "Parm1:%orderNum%" "Printer:\\Srv1\Small2"
+"%exePath%" -e "%reportPath%SHPPAPER.rpt" "Parm1:%orderNum%" "Printer:\\WATERP01.pixus-tech.local\PXS-MXM363N PCL6" "Use_Saved_Data_Recent:5"
 
 :: the list of serial numbers
 set /a "index = 1"
 :while1
 if %index% leq %printNum% (
-	"%exePath%" -e "%reportPath%SerialNumberList_v2.rpt" "Parm1:%orderNum%" "Printer:\\Srv1\Large1"
+	"%exePath%" -e "%reportPath%SerialNumberList_v2.rpt" "Parm1:%orderNum%" "Printer:\\WATERP01.pixus-tech.local\PXS-MXM363N PCL6" "Use_Saved_Data_Recent:5"
 	echo Printing Number %index%
 	set /a "index = index + 1"
 	goto :while1
 )
 	
 :: the configuration sheets
+:: searches for the correct file, then prints
 set searchPath=\\WATNAS\Userdata\Projects\
 set foundFilePath=
 echo Searching for the Configuration Sheet...
