@@ -11,5 +11,5 @@ mkdir %folderPath%
 :: QA sheet printing, and saving of file
 set exePath="C:\Program Files\Visual CUT 11\Visual CUT.exe"
 set reportName="\\WATDBS01\ExactShared\Exact\RMServer\Modified Reports\QAInspection2.2.rpt"
-::"%exePath%" -e "%reportName%" "Parm1:%orderNum%" "Parm2:%serialNum%" "Printer_Only:\\WATERP01.pixus-tech.local\PXS-MXM363N PCL6" "Use_Saved_Data_Recent:5"
-::"%exePath%" -e "%reportName%" "Parm1:%orderNum%" "Parm2:%serialNum%" "Export_Format:Adobe Acrobat (pdf)" "Export_File:%folderPath%\QA.pdf" "Use_Saved_Data_Recent:5"
+"%exePath%" -e "%reportName%" "Parm1:%orderNum%" "Parm2:%serialNum%" "Printer_Only:\\WATERP01.pixus-tech.local\PXS-MXM363N PCL6" "Use_Saved_Data_Recent:5"
+"%exePath%" -e "%reportName%" "Parm1:%orderNum%" "Parm2:%serialNum%" "Export_Format:Image" "Export_File:%folderPath%\QA.jpg" "Use_Saved_Data_Recent:5"

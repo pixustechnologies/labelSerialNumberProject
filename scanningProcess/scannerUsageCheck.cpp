@@ -17,7 +17,8 @@ void addDatabase(string data, int orderedNum);
 void updateDatabase(string barcode, int timesPrinting);
 int SerialNumberGet();
 int alreadyPrintedTimes(string data);
-void printStageTwo(int serialNum, string barcode, vector<string> labelReports, string inputSpec);
+void printStageTwo(int serialNum, string barcode, vector<string> labelReports, string inputSpec, string partNumber);
+void removeFiles(int startingSN, int endingSN);
 
 int main(int argc, char* argv[]) {   
     // starts via autohotkey
@@ -48,9 +49,9 @@ int main(int argc, char* argv[]) {
     int timesOrderedTotal = 10;
     int timesPrinting = 1;
     string partNum;
-    //partNum = name;
-    //int timesPrinting = (int) dueqty;
-    //int timesOrderedTotal = (int) dueqty;  
+    // partNum = name;
+    // timesPrinting = (int) dueqty;
+    // timesOrderedTotal = (int) dueqty;  
 
     //now searching for the labels associated with the part name
     vector<string> labelReports;
@@ -101,12 +102,12 @@ int main(int argc, char* argv[]) {
         stream >> timesPrinting;
     }
 
-    // main logic::
+    // main logic:
     string s;
     int startingSN = SerialNumberGet();
 
     if (inDatabase) { //if we have seen the barcode before, print labels
-        cout << "What should the input specification be?\n [Enter] for nothing\n";
+        cout << "What should the input specification be?\n [Enter] x2 for nothing\n";
         string inputSpec;
         cin.ignore();
         getline(cin, input);
@@ -119,7 +120,7 @@ int main(int argc, char* argv[]) {
         // printing all of the labels/documents per serial number, and counting up
         for (int i = 0; i < timesPrinting; i++) {
             int serialNum = SerialNumberGet();
-            printStageTwo(serialNum, barcode, labelReports, inputSpec);
+            printStageTwo(serialNum, barcode, labelReports, inputSpec, partNum);
             s = "serialNumberCountUp.bat";
             system( s.c_str() );
         }
@@ -132,18 +133,19 @@ int main(int argc, char* argv[]) {
             if (yesno == "a") {
                 for (int i = 0; i < timesPrinting; i++) {
                     int serialNum = startingSN + i;
-                    printStageTwo(serialNum, barcode, labelReports, inputSpec);
+                    printStageTwo(serialNum, barcode, labelReports, inputSpec, partNum);
                 }           
             } else if (yesno == "1") {
                 string sn;
                 cout << "Which Serial Number?\n";
                 cin >> sn;
-                printStageTwo(stoi(sn), barcode, labelReports, inputSpec);
+                printStageTwo(stoi(sn), barcode, labelReports, inputSpec, partNum);
             }
             cout << "Finished printing\n";
         } while (yesno != "n");
         
-
+        removeFiles(startingSN, SerialNumberGet());
+        
     } else { // haven't seen the barcode before, so print BOM, config, SN list
         if (!Contains(barcode)) { // *maybe they reverted, so cant assume it isnt there
             addDatabase(barcode, timesOrderedTotal);
@@ -257,16 +259,24 @@ void addDatabase(string data, int orderedNum) {
     bLog << data + s << endl;
 }
 
-void printStageTwo(int serialNumber, string orderNumber, vector<string> labelReports, string inputSpecification) {
+void printStageTwo(int serialNumber, string orderNumber, vector<string> labelReports, string inputSpecification, string partNumber) {
     // prints the QA sheet, and all of the labels in the respective
     string s = "printQA.bat " + orderNumber + " " + to_string(serialNumber);
     system( s.c_str() );
-    for (int j = 0; j < labelReports.size(); j++) { // prints all labels in assembly - some arnt?
+    for (int j = 0; j < labelReports.size(); j++) { 
         string reportName;
         istringstream iss(labelReports[j], istringstream::in);
-        while( iss >> reportName ) {
-            s = "printLabelsv2.bat " + orderNumber + " " + to_string(serialNumber) + " " + reportName + " "  + inputSpecification;
+        while ( iss >> reportName ) {
+            s = "printLabelsv2.bat " + orderNumber + " " + to_string(serialNumber) + " " + reportName + " "  + inputSpecification + " " + partNumber;
             system( s.c_str() );
         }
+    }
+}
+
+void removeFiles(int startingSN, int endingSN) {
+    // removes the folder for each serial number's label files
+    for (int i = startingSN; i < endingSN; i++) {
+        string s = "deleteSavedFiles.bat " + i;
+        system( s.c_str() );
     }
 }

@@ -3,7 +3,8 @@
 set orderNum=%1
 set serialNum=%2
 set reportName=%3
-set inputSpec=%4
+set Parm3=%4
+set prtnum=%5
 
 set folderPath="\\WATNAS\Production\Saved Labels\%serialNum%"
 set exePath="C:\Program Files\Visual CUT 11\Visual CUT.exe"
@@ -21,37 +22,44 @@ echo "%foundFilePath%"
 :: checks which printer to print to
 set printerName=
 :: PRINTER NAMES UNTESTED
-if %reportName% == "01A000037-A01" (
-	set printerName="1.25x25-Citizen CLP-631"
-) else if %reportName% == "01A000038-A01" (
-	set printerName="1.25x25-Citizen CLP-631"
-) else if %reportName% == "01A000039-A01" (
+if %prtnum% == "94A000003-A01" (
 	set printerName="2.0x0.25 - Citizen CLP-631"
-) else if %reportName% == "01A000040-A01" (
-	set printerName="1.25x25-Citizen CLP-631"
-) else if %reportName% == "01A000041-A02" (
-	set printerName="ZDesigner 105SL 300DPI"
-) else if %reportName% == "01A000042-A01" (
+) else if %prtnum% == "94A000004-A01" (
 	set printerName="075x25-Citizen CLP-631"
-) else if %reportName% == "01A000052-A01" (
-	set printerName="2.0x0.25 - Citizen CLP-631"
-) else if %reportName% == "01A000077-A01" (
-	set printerName="2.0x0.25 - Citizen CLP-631"
-) else if %reportName% == "01A000163-A01" (
+) else if %prtnum% == "94A000005-A01" (
+	set printerName="ZDesigner 105SL 300DPI"
+) else if %prtnum% == "94A000006-A01" (
 	set printerName="1.25x25-Citizen CLP-631"
-) else if %reportName% == "01A0001XX-A01" (
-	:: fix XX here when label is created
+) else if %prtnum% == "94A000007-A01" (
+	set printerName=""
+) else if %prtnum% == "94A000009-A01" (
+	set printerName=""
+) else if %prtnum% == "94A000039-A01" (
+	set printerName=""
+) else if %prtnum% == "94A000040-A01" (
+	set printerName=""
+) else if %prtnum% == "94A000041-A01" (
+	set printerName=""
+) else if %prtnum% == "94A000042-A01" (
+	set printerName=""
+) else if %prtnum% == "94A000043-A01" (
+	set printerName=""
+) else if %prtnum% == "94A000044-A01" (
+	set printerName=""
+) else if %prtnum% == "94A000045-A01" (
+	set printerName=""
+) else if %prtnum% == "94A000046-A01" (
+	set printerName=""
+) else if %prtnum% == "94A000047-A01" (
 	set printerName="PXS-LP2844-02"
 ) else {
 	goto :noMatch
 }
 
 :: prints file, and saves file to folder
-"%exePath%" -e "%foundFilePath%" "Parm1:%orderNum%" "Parm2:%serialNum%" "Parm3:%inputSpec%" "Printer_Only:%printerName%" "Use_Saved_Data_Recent:5"
-"%exePath%" -e "%foundFilePath%" "Parm1:%orderNum%" "Parm2:%serialNum%" "Parm3:%inputSpec%" "Export_Format:Adobe Acrobat (pdf)" "Export_File:%folderPath%\Label_%reportName%.pdf" "Use_Saved_Data_Recent:5"
-:: change file output format still
-:: "Adobe Acrobat (pdf)" 
-:: (see valid export format options in the Visual CUT drop-down list for export formats). 
-:: PAGE 103
+:: need to test if parm3 ruins or not !
+"%exePath%" -e "%foundFilePath%" "Parm1:%orderNum%" "Parm2:%serialNum%" "Parm3:%Parm3%" "Printer_Only:%printerName%" "Use_Saved_Data_Recent:5"
+"%exePath%" -e "%foundFilePath%" "Parm1:%orderNum%" "Parm2:%serialNum%" "Parm3:%Parm3%" "Export_Format:Image" "Export_File:%folderPath%\Label_%reportName%.jpg" "Use_Saved_Data_Recent:5"
+:: PAGE 270
 
 :noMatch
