@@ -9,17 +9,17 @@ int main(int argc, char* argv[]) {
     // reads in the barcode log file 
     ifstream file("bLog.txt");
     vector<string> barcodes;
-    vector<int> printNums;
-    vector<int> totalPrintNums;
-    string input;
-    string barcode;
-    int printedTimes;
-    int numOfOrders;
+    vector<int> printNums, totalPrintNums;
+    string input, barcode;
+    int printedTimes, numOfOrders;
     while(getline(file, input)){
         istringstream line(input);
         line >> barcode;
+        barcodes.push_back(barcode);
         line >> printedTimes;
+        printNums.push_back(printedTimes);
         line >> numOfOrders;
+        totalPrintNums.push_back(numOfOrders);
     }
     // removes the old barcode log file, and replaces it with a condensed version
     // by removing the oldest X percent of barcodes in the log
@@ -31,10 +31,7 @@ int main(int argc, char* argv[]) {
     for(int i = start; i < barcodes.size(); i++){
         bLogOut << barcodes[i] + " ";
         bLogOut << to_string(printNums[i]) + " ";
-        bLogOut << to_string(totalPrintNums[i]);
-        if(i+1 != barcodes.size()){
-            bLogOut << "\n";
-        }
+        bLogOut << to_string(totalPrintNums[i]) << "\n";
     }
     return 0;
 }

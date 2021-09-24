@@ -36,4 +36,5 @@ TECH DEBT:
 - Crystal reports wont intake a text file easily, serial number is being imported as a parameter via visual cut
     - Tried ODBC text file
 - Set paper printer to default to duplex
+- INSTALL SQL SERVER 2019, download x86 and x64 and seperate installer? 
 - https://github.com/pixustechnologies/labelSerialNumberProject

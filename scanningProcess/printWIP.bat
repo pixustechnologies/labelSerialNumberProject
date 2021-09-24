@@ -21,7 +21,7 @@ if %index% leq %printNum% (
 	
 :: the configuration sheets
 :: searches for the correct file, then prints
-set searchPath=\\WATNAS\Userdata\Projects\
+set searchPath="\\WATNAS\Userdata\Projects\Configuration Sheets"
 set foundFilePath=
 echo Searching for the Configuration Sheet...
 FOR /R "%searchPath%" %%a  in (%prtnum%*.docx) DO (
@@ -30,12 +30,12 @@ FOR /R "%searchPath%" %%a  in (%prtnum%*.docx) DO (
         SET foundFilePath=%%~fa
     )
 )
-echo "%foundFilePath%"
+echo Printing -> "%foundFilePath%"
 echo Finished Searching
-call "C:\Program Files\Microsoft Office\root\Office16\WINWORD.EXE" "%foundFilePath%" /q /n /mFilePrintDefault /mFileExit
+call "C:\Program Files\Microsoft Office\root\Office16\WINWORD.EXE" /q /n "%foundFilePath%" /mFilePrintDefault /mFileCloseOrExit /mFileExit 
 
 :: dialoge box to indicate it finished printing
 echo.
 echo Finished Printing
 echo.
-PAUSE
+timeout 5

@@ -3,8 +3,7 @@
 set orderNum=%1
 set serialNum=%2
 set reportName=%3
-set Parm3=%4
-set prtnum=%5
+set prtnum=%4
 
 set folderPath="\\WATNAS\Production\Saved Labels\%serialNum%"
 set exePath="C:\Program Files\Visual CUT 11\Visual CUT.exe"
@@ -58,8 +57,19 @@ if %prtnum% == "94A000003-A01" (
 
 :: prints file, and saves file to folder
 :: need to test if parm3 ruins or not !
-"%exePath%" -e "%foundFilePath%" "Parm1:%orderNum%" "Parm2:%serialNum%" "Parm3:%Parm3%" "Printer_Only:%printerName%" "Use_Saved_Data_Recent:5"
-"%exePath%" -e "%foundFilePath%" "Parm1:%orderNum%" "Parm2:%serialNum%" "Parm3:%Parm3%" "Export_Format:Image" "Export_File:%folderPath%\Label_%reportName%.jpg" "Use_Saved_Data_Recent:5"
+if "%~5" == "" (
+	"%exePath%" -e "%foundFilePath%" "Parm1:%orderNum%" "Parm2:%serialNum%" "Printer_Only:%printerName%" "Use_Saved_Data_Recent:5"
+	"%exePath%" -e "%foundFilePath%" "Parm1:%orderNum%" "Parm2:%serialNum%" "Export_Format:Image" "Export_File:%folderPath%\Label_%reportName%.jpg" "Use_Saved_Data_Recent:5"
+) else if "%~6" == "" (
+	"%exePath%" -e "%foundFilePath%" "Parm1:%orderNum%" "Parm2:%serialNum%" "Parm3:%5" "Printer_Only:%printerName%" "Use_Saved_Data_Recent:5"
+	"%exePath%" -e "%foundFilePath%" "Parm1:%orderNum%" "Parm2:%serialNum%" "Parm3:%5" "Export_Format:Image" "Export_File:%folderPath%\Label_%reportName%.jpg" "Use_Saved_Data_Recent:5"
+) else if "%~7" == "" (
+	"%exePath%" -e "%foundFilePath%" "Parm1:%orderNum%" "Parm2:%serialNum%" "Parm3:%5" "Parm4:%6" "Printer_Only:%printerName%" "Use_Saved_Data_Recent:5"
+	"%exePath%" -e "%foundFilePath%" "Parm1:%orderNum%" "Parm2:%serialNum%" "Parm3:%5" "Parm4:%6" "Export_Format:Image" "Export_File:%folderPath%\Label_%reportName%.jpg" "Use_Saved_Data_Recent:5"
+) else (
+	"%exePath%" -e "%foundFilePath%" "Parm1:%orderNum%" "Parm2:%serialNum%" "Parm3:%5" "Parm4:%6" "Parm5:%7" "Printer_Only:%printerName%" "Use_Saved_Data_Recent:5"
+	"%exePath%" -e "%foundFilePath%" "Parm1:%orderNum%" "Parm2:%serialNum%" "Parm3:%5" "Parm4:%6" "Parm5:%7" "Export_Format:Image" "Export_File:%folderPath%\Label_%reportName%.jpg" "Use_Saved_Data_Recent:5"
+)
 :: PAGE 270
 
 :noMatch
