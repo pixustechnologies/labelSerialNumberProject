@@ -1,16 +1,9 @@
 #include <iostream>
 #include <fstream>
-#include <stdlib.h>
 #include <vector>
 #include <sstream>
-#include <stdio.h>
 #include <string.h>
-#include <cstdlib>
-// #include <sqlenv.h>
-// #include <sqlcodes.h>
-#include <stdio.h>
-// #include <sqlca.h>
-// #include "util.h"
+#include <windows.h>
 
 using namespace std;
 
@@ -21,9 +14,6 @@ int SerialNumberGet();
 int alreadyPrintedTimes(string data);
 void printStageTwo(int serialNum, string barcode, vector<string> labelReports, vector<string> partNumber);
 void removeFiles(int startingSN, int endingSN);
-
-
-// EXEC SQL INCLUDE SQLCA;
 
 int main(int argc, char* argv[]) {   
     // starts via autohotkey
@@ -55,8 +45,15 @@ int main(int argc, char* argv[]) {
             int pos = fInput.find(inputProcesser) + inputProcesser.size() + 1;
             inputProcesser = fInput.substr(pos);
             labelReports.push_back(inputProcesser);
-            //cout << partNum << timesOrderedTotal << labelNames.back() << labelReports.back();
         } 
+    }
+    // closes if there is no shop order active with that number
+    if(labelNames.size() == 0){
+        cout << "There appears not to be any shop orders active with that number";
+        string s = "removeSQLqueries.bat";
+        system( s.c_str() );
+        Sleep(5000);
+        exit(1);
     }
 
     // asks if the user would like to revert to the first stage, or continue
@@ -75,7 +72,6 @@ int main(int argc, char* argv[]) {
     } else {
         cout << "First step: \n Printing the Assembly Documents, and multiple Serial Number Lists \n";
     }
-
     cout << "How many times would you like to print? [default = " << timesPrinting <<
             " ]. \n [Enter] to continue with the default, otherwise submit a new number to change\n";
     string input;
@@ -91,15 +87,6 @@ int main(int argc, char* argv[]) {
     int startingSN = SerialNumberGet();
 
     if (inDatabase) { //if we have seen the barcode before, print labels
-        cout << "What should the input specification be?\n [Enter] x2 for nothing\n";
-        string inputSpec;
-        cin.ignore();
-        getline(cin, input);
-        if ( !input.empty() ) {
-            std::istringstream stream( input );
-            stream >> inputSpec;
-        }
-        
         updateDatabase(barcode, timesPrinting);
         // printing all of the labels/documents per serial number, and counting up
         for (int i = 0; i < timesPrinting; i++) {
@@ -267,8 +254,11 @@ void printStageTwo(int serialNumber, string orderNumber, vector<string> labelRep
 
 void removeFiles(int startingSN, int endingSN) {
     // removes the folder for each serial number's label files
+    string s;
     for (int i = startingSN; i < endingSN; i++) {
-        string s = "deleteSavedFiles.bat " + i;
+        s = "deleteSavedFiles.bat " + i;
         system( s.c_str() );
     }
+    s = "removeSQLqueries.bat";
+    system( s.c_str() );
 }
