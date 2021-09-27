@@ -27,8 +27,7 @@ int main(int argc, char* argv[]) {
     int timesOrderedTotal = 10;
     int timesPrinting = 10;
     string partNum;
-    vector<string> labelReports;
-    vector<string> labelNames;
+    vector<string> labelReports, labelNames;
 
     // pull data from text file (sql query saves to it every run)
     ifstream file("Labels.txt");
@@ -45,6 +44,21 @@ int main(int argc, char* argv[]) {
             int pos = fInput.find(inputProcesser) + inputProcesser.size() + 1;
             inputProcesser = fInput.substr(pos);
             labelReports.push_back(inputProcesser);
+        } 
+    }
+    vector<string> documentReports;
+    ifstream file("Documents.txt");
+    while(getline(file, fInput)){
+        istringstream line(fInput);
+        line >> ordernum;
+        if (ordernum == barcode) {
+            line >> inputProcesser;
+            line >> inputProcesser;
+            line >> inputProcesser;
+            //get rest for note
+            int pos = fInput.find(inputProcesser) + inputProcesser.size() + 1;
+            inputProcesser = fInput.substr(pos);
+            documentReports.push_back(inputProcesser);
         } 
     }
     // closes if there is no shop order active with that number
@@ -120,6 +134,24 @@ int main(int argc, char* argv[]) {
     } else { // haven't seen the barcode before, so print BOM, config, SN list
         if (!Contains(barcode)) { // *maybe they reverted, so cant assume it isnt there
             addDatabase(barcode, timesOrderedTotal);
+        }
+        for (int i = 0; i < documentReports.size(); i++) {
+            string reportName, parm1 = "", parm2= "", parm3 = "";
+            string token;
+            vector<string> noteParts;
+            istringstream iss(documentReports[i]);
+            // parses with ? as the delimiter, up to 3 parameters 
+            while ( getline(iss, token, '?') ) { 
+                noteParts.push_back(token);
+            }
+            reportName = noteParts.at(0);
+            if(noteParts.size() > 1) 
+                parm1 = noteParts.at(1);
+            if(noteParts.size() > 2) 
+                parm2 = noteParts.at(2);
+            if(noteParts.size() > 3) 
+                parm3 = noteParts.at(3);
+            s = "printWIPDocuments.bat " + barcode + " " + reportName + " " + parm1 + " " + parm2 + " " + parm3; 
         }
         s = "printWIP.bat " + barcode + " " + partNum + " " + to_string(timesPrinting);   
         system( s.c_str() ); 
@@ -244,9 +276,12 @@ void printStageTwo(int serialNumber, string orderNumber, vector<string> labelRep
             noteParts.push_back(token);
         }
         reportName = noteParts.at(0);
-        parm1 = noteParts.at(1);
-        parm2 = noteParts.at(2);
-        parm3 = noteParts.at(3);
+        if(noteParts.size() > 1) 
+            parm1 = noteParts.at(1);
+        if(noteParts.size() > 2) 
+            parm2 = noteParts.at(2);
+        if(noteParts.size() > 3) 
+            parm3 = noteParts.at(3);
         s = "printLabelsv2.bat " + orderNumber + " " + to_string(serialNumber) + " " + reportName + " " + partNumber[j] + " " + parm1 + " " + parm2 + " " + parm3;
         system( s.c_str() );
     }

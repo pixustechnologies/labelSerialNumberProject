@@ -6,4 +6,8 @@ set sqlPath="C:\Users\jwScott\Documents\workspace\labelSerialNumberProject\scann
 set outputPath="C:\Users\jwScott\Documents\workspace\labelSerialNumberProject\scanningProcess\Labels.txt"
 sqlcmd -U %u% -P %ps% -S %serverName% -i %sqlPath% -o %outputPath%
 
+set sqlPath="C:\Users\jwScott\Documents\workspace\labelSerialNumberProject\scanningProcess\documentQuery.sql"
+set outputPath="C:\Users\jwScott\Documents\workspace\labelSerialNumberProject\scanningProcess\Documents.txt"
+sqlcmd -U %u% -P %ps% -S %serverName% -i %sqlPath% -o %outputPath%
+
 

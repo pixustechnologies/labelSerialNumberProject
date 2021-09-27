@@ -21,7 +21,7 @@ if %index% leq %printNum% (
 	
 :: the configuration sheets
 :: searches for the correct file, then prints
-set searchPath="\\WATNAS\Userdata\Projects\Configuration Sheets"
+set searchPath="\\WATNAS\Userdata\Projects"
 set foundFilePath=
 echo Searching for the Configuration Sheet...
 FOR /R "%searchPath%" %%a  in (%prtnum%*.docx) DO (

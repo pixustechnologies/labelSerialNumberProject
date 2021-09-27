@@ -1,3 +1,4 @@
 @echo off
-:: removes the SQL query
+:: removes the SQL queries
 DEL Labels.txt
+DEL Documents.txt
