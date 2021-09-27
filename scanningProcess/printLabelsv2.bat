@@ -16,7 +16,6 @@ FOR /R "%searchPath%" %%a  in (%reportName%*.rpt) DO (
         SET foundFilePath=%%~fa
     )
 )
-echo "%foundFilePath%"
 
 :: checks which printer to print to
 set printerName=
@@ -56,20 +55,24 @@ if %prtnum% == "94A000003-A01" (
 }
 
 :: prints file, and saves file to folder
-:: need to test if parm3 ruins or not !
 if "%~5" == "" (
 	"%exePath%" -e "%foundFilePath%" "Parm1:%orderNum%" "Parm2:%serialNum%" "Printer_Only:%printerName%" "Use_Saved_Data_Recent:5"
 	"%exePath%" -e "%foundFilePath%" "Parm1:%orderNum%" "Parm2:%serialNum%" "Export_Format:Image" "Export_File:%folderPath%\Label_%reportName%.jpg" "Use_Saved_Data_Recent:5"
-) else if "%~6" == "" (
-	"%exePath%" -e "%foundFilePath%" "Parm1:%orderNum%" "Parm2:%serialNum%" "Parm3:%5" "Printer_Only:%printerName%" "Use_Saved_Data_Recent:5"
-	"%exePath%" -e "%foundFilePath%" "Parm1:%orderNum%" "Parm2:%serialNum%" "Parm3:%5" "Export_Format:Image" "Export_File:%folderPath%\Label_%reportName%.jpg" "Use_Saved_Data_Recent:5"
-) else if "%~7" == "" (
-	"%exePath%" -e "%foundFilePath%" "Parm1:%orderNum%" "Parm2:%serialNum%" "Parm3:%5" "Parm4:%6" "Printer_Only:%printerName%" "Use_Saved_Data_Recent:5"
-	"%exePath%" -e "%foundFilePath%" "Parm1:%orderNum%" "Parm2:%serialNum%" "Parm3:%5" "Parm4:%6" "Export_Format:Image" "Export_File:%folderPath%\Label_%reportName%.jpg" "Use_Saved_Data_Recent:5"
-) else (
-	"%exePath%" -e "%foundFilePath%" "Parm1:%orderNum%" "Parm2:%serialNum%" "Parm3:%5" "Parm4:%6" "Parm5:%7" "Printer_Only:%printerName%" "Use_Saved_Data_Recent:5"
-	"%exePath%" -e "%foundFilePath%" "Parm1:%orderNum%" "Parm2:%serialNum%" "Parm3:%5" "Parm4:%6" "Parm5:%7" "Export_Format:Image" "Export_File:%folderPath%\Label_%reportName%.jpg" "Use_Saved_Data_Recent:5"
+) else ( 
+	if "%~6" == "" (
+		"%exePath%" -e "%foundFilePath%" "Parm1:%orderNum%" "Parm2:%serialNum%" "Parm3:%5" "Printer_Only:%printerName%" "Use_Saved_Data_Recent:5"
+		"%exePath%" -e "%foundFilePath%" "Parm1:%orderNum%" "Parm2:%serialNum%" "Parm3:%5" "Export_Format:Image" "Export_File:%folderPath%\Label_%reportName%.jpg" "Use_Saved_Data_Recent:5"
+	) else (
+		if "%~7" == "" (
+			"%exePath%" -e "%foundFilePath%" "Parm1:%orderNum%" "Parm2:%serialNum%" "Parm3:%5" "Parm4:%6" "Printer_Only:%printerName%" "Use_Saved_Data_Recent:5"
+			"%exePath%" -e "%foundFilePath%" "Parm1:%orderNum%" "Parm2:%serialNum%" "Parm3:%5" "Parm4:%6" "Export_Format:Image" "Export_File:%folderPath%\Label_%reportName%.jpg" "Use_Saved_Data_Recent:5"
+		) else (
+			"%exePath%" -e "%foundFilePath%" "Parm1:%orderNum%" "Parm2:%serialNum%" "Parm3:%5" "Parm4:%6" "Parm5:%7" "Printer_Only:%printerName%" "Use_Saved_Data_Recent:5"
+			"%exePath%" -e "%foundFilePath%" "Parm1:%orderNum%" "Parm2:%serialNum%" "Parm3:%5" "Parm4:%6" "Parm5:%7" "Export_Format:Image" "Export_File:%folderPath%\Label_%reportName%.jpg" "Use_Saved_Data_Recent:5"
+		)
+	)
 )
+
 :: PAGE 270
 
 :noMatch

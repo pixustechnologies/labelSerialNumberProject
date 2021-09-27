@@ -37,4 +37,6 @@ TECH DEBT:
     - Tried ODBC text file
 - Set paper printer to default to duplex
 - INSTALL SQL SERVER 2019, download x86 and x64 and seperate installer? 
+- adobe acrobat
+- cant open adobe silently
 - https://github.com/pixustechnologies/labelSerialNumberProject

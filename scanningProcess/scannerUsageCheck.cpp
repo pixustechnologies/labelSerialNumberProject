@@ -135,8 +135,9 @@ int main(int argc, char* argv[]) {
         if (!Contains(barcode)) { // *maybe they reverted, so cant assume it isnt there
             addDatabase(barcode, timesOrderedTotal);
         }
+        // goes through each of the files 
         for (int i = 0; i < documentReports.size(); i++) {
-            string reportName, parm1 = "", parm2= "", parm3 = "";
+            string reportName, parm1 = "";
             string token;
             vector<string> noteParts;
             istringstream iss(documentReports[i]);
@@ -145,36 +146,12 @@ int main(int argc, char* argv[]) {
                 noteParts.push_back(token);
             }
             reportName = noteParts.at(0);
-            if(noteParts.size() > 1) 
-                parm1 = noteParts.at(1);
-            if(noteParts.size() > 2) 
-                parm2 = noteParts.at(2);
-            if(noteParts.size() > 3) 
-                parm3 = noteParts.at(3);
-            s = "printWIPDocuments.bat " + barcode + " " + reportName + " " + parm1 + " " + parm2 + " " + parm3; 
+            parm1 = noteParts.at(1);
+            s = "printWIPDocuments.bat " + reportName + " " + parm1; 
         }
         s = "printWIP.bat " + barcode + " " + partNum + " " + to_string(timesPrinting);   
         system( s.c_str() ); 
     }
-    // closing SQL
-    /*
-end:
-
-    EXEC SQL CLOSE LabelSearch;
-    EXEC SQL COMMIT;
-    EXEC SQL CONNECT reset;
-    exit(0);
-
-error:
-    check_error("Error",&sqlca);
-    EXEC SQL WHENEVER SQLERROR CONTINUE;
-
-    EXEC SQL ROLLBACK;
-    EXEC SQL CONNECT reset;
-    exit(1);
-
-    return 0;
-    */
 }
 
 bool Contains(string data) {

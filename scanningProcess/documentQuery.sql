@@ -8,7 +8,7 @@ WHERE   om.ORDNUM_10 = rd.ORDNUM_11
         AND wn.COMPRT_61 = rd.PRTNUM_11
         AND wn.PRTNUM_61 = om.PRTNUM_10
         AND LEFT(om.ORDNUM_10, 1) = '5'
-        AND LEFT(rd.PRTNUM_11, 3) = '0' + '1' + 'A'
+        AND rd.PRTNUM_11 = 'D' + 'o' + 'c' + 'u'  + 'm'  + 'e'  + 'n'  + 't'  + ' '  + 'B'  + 'O'  + 'M' 
         AND om.DUEQTY_10 > 0 
         AND ps.COMPRT_02 = om.PRTNUM_10
         AND pm.PRTNUM_01 = om.PRTNUM_10
