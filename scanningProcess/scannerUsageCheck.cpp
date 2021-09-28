@@ -235,18 +235,36 @@ void updateDatabase(string data, int currentPrintedTimes) {
     for(int i = 0; i < barcodes.size(); i++){
         bLogOut << barcodes[i] + " ";
         bLogOut << to_string(printNums[i]) + " ";
-        bLogOut << to_string(totalPrintNums[i]);
-        if(i+1 != barcodes.size()){
-            bLogOut << "\n";
-        }
+        bLogOut << to_string(totalPrintNums[i]) << "\n";
     }
 }
 
 void addDatabase(string data, int orderedNum) {
     // adds the new barcode into the system
-    ofstream bLog("bLog.txt");
+    ifstream file("bLog.txt");
+    vector<string> barcodes;
+    vector<int> printNums, totalPrintNums;
+    string input, barcode;
+    int printedTimes, numOfOrders;
+    while(getline(file, input)){
+        istringstream line(input);
+        line >> barcode;
+        line >> printedTimes;
+        line >> numOfOrders;
+        barcodes.push_back(barcode);
+        printNums.push_back(printedTimes);
+        totalPrintNums.push_back(numOfOrders);
+    }
+    file.close();
+    remove("bLog.txt");
+    ofstream bLogOut("bLog.txt");
+    for(int i = 0; i < barcodes.size(); i++){
+        bLogOut << barcodes[i] + " ";
+        bLogOut << to_string(printNums[i]) + " ";
+        bLogOut << to_string(totalPrintNums[i]) << "\n";
+    }
     string s = " 0 " + to_string(orderedNum);
-    bLog << data + s << endl;
+    bLogOut << data + s << endl;
 }
 
 void printStageTwo(int serialNumber, string orderNumber, vector<string> labelReports, vector<string> partNumber) {
