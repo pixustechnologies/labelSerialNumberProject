@@ -45,10 +45,12 @@ int main(int argc, char* argv[]) {
             inputProcesser = fInput.substr(pos);
             labelReports.push_back(inputProcesser);
         } 
+        ordernum="";
     }
+    file.close();
     vector<string> documentReports;
-    ifstream file("Documents.txt");
-    while(getline(file, fInput)){
+    ifstream file2("Documents.txt");
+    while(getline(file2, fInput)){
         istringstream line(fInput);
         line >> ordernum;
         if (ordernum == barcode) {
@@ -60,7 +62,9 @@ int main(int argc, char* argv[]) {
             inputProcesser = fInput.substr(pos);
             documentReports.push_back(inputProcesser);
         } 
+        ordernum="";
     }
+    file2.close();
     // closes if there is no shop order active with that number
     if(labelNames.size() == 0){
         cout << "There appears not to be any shop orders active with that number";
@@ -162,11 +166,13 @@ bool Contains(string data) {
         istringstream line(input);
         line >> barcode;
         if (barcode == data) {
+        file.close();
             return true;
         }
         line >> barcode;
         line >> barcode;
     }
+    file.close();
     return false;
 }
 
@@ -181,9 +187,11 @@ int alreadyPrintedTimes(string data) {
         line >> printedTimes;
         line >> numOfOrders;
         if (barcode == data) {
+            file.close();
             return printedTimes;
         }
     }
+    file.close();
     return 0;
 }
 
@@ -196,6 +204,7 @@ int SerialNumberGet() {
         istringstream line(input);
         line >> serialNumber;
     }
+    file.close();
     return serialNumber;
 }
 
@@ -220,6 +229,7 @@ void updateDatabase(string data, int currentPrintedTimes) {
             totalPrintNums.push_back(numOfOrders);
         //}
     }
+    file.close();
     remove("bLog.txt");
     ofstream bLogOut("bLog.txt");
     for(int i = 0; i < barcodes.size(); i++){

@@ -39,4 +39,5 @@ TECH DEBT:
 - INSTALL SQL SERVER 2019, download x86 and x64 and seperate installer? 
 - adobe acrobat
 - cant open adobe silently
+- update file paths with respective user
 - https://github.com/pixustechnologies/labelSerialNumberProject
