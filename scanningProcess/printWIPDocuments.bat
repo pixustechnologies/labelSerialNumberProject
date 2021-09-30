@@ -28,7 +28,7 @@ if "%fileextension%" == ".docx" GOTO :docx
 if "%fileextension%" == ".DOCX" GOTO :docx
 GOTO :end
 :pdf
-"C:\Users\%USERNAME%\Documents\workspace\labelSerialNumberProject\install\PDFtoPrinter.exe" /s "%foundFilePath%"
+"C:\Users\%USERNAME%\Documents\labelSerialNumberProject\install\PDFtoPrinter.exe" /s "%foundFilePath%"
 GOTO :end
 :docx
 call "C:\Program Files\Microsoft Office\root\Office16\WINWORD.EXE" /q /n "%foundFilePath%" /mFilePrintDefault /mFileCloseOrExit /mFileExit
