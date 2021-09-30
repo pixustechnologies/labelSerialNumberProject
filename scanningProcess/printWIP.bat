@@ -11,14 +11,25 @@ set reportPath=\\WATDBS01\ExactShared\Exact\RMServer\Modified Reports\
 
 :: the list of serial numbers
 set /a "index = 1"
-:while1
+if %prtnum% == 02A* (
+    goto :assy
+)
+:part &:: this is for normal parts
 if %index% leq %printNum% (
 	"%exePath%" -e "%reportPath%SerialNumberList_v2.rpt" "Parm1:%orderNum%" "Printer:\\WATERP01.pixus-tech.local\PXS-MXM363N PCL6" "Use_Saved_Data_Recent:5"
 	echo Printing Number %index%
 	set /a "index = index + 1"
-	goto :while1
+	goto :part
 )
-	
+goto :config
+:assy &:: this is for parts that are assemblys, which dont have a assembly number
+if %index% leq %printNum% (
+	"%exePath%" -e "%reportPath%SerialNumberList_v3.rpt" "Parm1:%orderNum%" "Printer:\\WATERP01.pixus-tech.local\PXS-MXM363N PCL6" "Use_Saved_Data_Recent:5"
+	echo Printing Number %index%
+	set /a "index = index + 1"
+	goto :assy
+)
+:config
 :: the configuration sheets
 :: searches for the correct file, then prints
 set searchPath="\\WATNAS\Userdata\Projects"
