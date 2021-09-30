@@ -4,8 +4,8 @@ set orderNum=%1
 set prtnum=%2
 set printNum=%3
 
-set exePath="C:\Program Files\Visual CUT 11\Visual CUT.exe"
-set reportPath="\\WATDBS01\ExactShared\Exact\RMServer\Modified Reports\"
+set exePath=C:\Program Files (x86)\Visual CUT 11\Visual CUT.exe
+set reportPath=\\WATDBS01\ExactShared\Exact\RMServer\Modified Reports\
 :: the BOM
 "%exePath%" -e "%reportPath%SHPPAPER.rpt" "Parm1:%orderNum%" "Printer:\\WATERP01.pixus-tech.local\PXS-MXM363N PCL6" "Use_Saved_Data_Recent:5"
 

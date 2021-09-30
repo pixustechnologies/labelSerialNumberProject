@@ -5,10 +5,10 @@ set serialNum=%2
 set reportName=%3
 set prtnum=%4
 
-set folderPath="\\WATNAS\Production\Saved Labels\%serialNum%"
-set exePath="C:\Program Files\Visual CUT 11\Visual CUT.exe"
+set folderPath=\\WATNAS\Production\Saved Labels\%serialNum%
+set exePath=C:\Program Files (x86)\Visual CUT 11\Visual CUT.exe
 :: searches for the file path where the report is stored
-set searchPath="\\WATDBS01\ExactShared\Exact\RMServer\Modified Reports\"
+set searchPath=\\WATDBS01\ExactShared\Exact\RMServer\Modified Reports\
 set foundFilePath=
 FOR /R "%searchPath%" %%a  in (%reportName%*.rpt) DO (
     IF EXIST "%%~fa" (
