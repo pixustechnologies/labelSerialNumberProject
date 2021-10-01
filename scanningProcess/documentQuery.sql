@@ -10,7 +10,8 @@ WHERE   om.ORDNUM_10 = rd.ORDNUM_11
         AND LEFT(om.ORDNUM_10, 1) = '5'
         AND rd.PRTNUM_11 = 'D' + 'o' + 'c' + 'u'  + 'm'  + 'e'  + 'n'  + 't'  + ' '  + 'B'  + 'O'  + 'M' 
         AND om.DUEQTY_10 > 0 
-        AND ps.COMPRT_02 = om.PRTNUM_10
+        AND (ps.COMPRT_02 = om.PRTNUM_10 OR 1 = 1)
         AND pm.PRTNUM_01 = om.PRTNUM_10
+        AND om.STATUS_10 = '3'
 
 ORDER BY om.ORDNUM_10
