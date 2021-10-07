@@ -66,20 +66,12 @@ int main(int argc, char* argv[]) {
         ordernum="";
     }
     file2.close();
-    // closes if there is no shop order active with that number
-    if(labelNames.size() == 0){
-        cout << "There appears not to be any shop orders active with that number";
-        string s = "removeSQLqueries.bat";
-        system( s.c_str() );
-        Sleep(5000);
-        exit(1);
-    }
 
     // asks if the user would like to revert to the first stage, or continue
     string yesno;
     timesPrinting = timesOrderedTotal;
     if (inDatabase) {
-        cout << "Second step: \n Printing mutliple QA Sheets and Box + Product Labels \n"
+        cout << "Second step: \n Printing QA Sheets and Labels \n"
              << "Revert to Assembly Documents + Serial Number List printing? (y/n)\n";
         cin >> yesno;
         if (yesno == "y") {
@@ -107,6 +99,16 @@ int main(int argc, char* argv[]) {
 
     if (inDatabase) { //if we have seen the barcode before, print labels
         updateDatabase(barcode, timesPrinting);
+
+        // closes if there is no labels in that number
+        if(labelNames.size() == 0){
+            cout << "There appears no labels with that shop order";
+            string s = "removeSQLqueries.bat";
+            system( s.c_str() );
+            Sleep(5000);
+            exit(1);
+        }
+
         // printing all of the labels/documents per serial number, and counting up
         for (int i = 0; i < timesPrinting; i++) {
             int serialNum = SerialNumberGet();
@@ -288,6 +290,7 @@ void printStageTwo(int serialNumber, string orderNumber, vector<string> labelRep
             parm2 = noteParts.at(2);
         if(noteParts.size() > 3) 
             parm3 = noteParts.at(3);
+        cout << "Printing " << reportName << " report with label " << partNumber[j] << " with parameters:  " + parm1 + " " + parm2 + " " + parm3 ;
         s = "printLabelsv2.bat " + orderNumber + " " + to_string(serialNumber) + " " + reportName + " " + partNumber[j] + " " + parm1 + " " + parm2 + " " + parm3;
         system( s.c_str() );
     }

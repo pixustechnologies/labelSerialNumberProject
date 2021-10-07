@@ -5,7 +5,7 @@ set serialNum=%2
 set reportName=%3
 set prtnum=%4
 
-set folderPath=\\WATNAS\Production\Saved Labels\%serialNum%
+set folderPath=\\WATNAS\Production\Saved_Labels\%serialNum%
 set exePath=C:\Program Files (x86)\Visual CUT 11\Visual CUT.exe
 :: searches for the file path where the report is stored
 set searchPath=\\WATDBS01\ExactShared\Exact\RMServer\Modified Reports\
@@ -21,58 +21,37 @@ FOR /R "%searchPath%" %%a  in (%reportName%*.rpt) DO (
 set printerName=
 :: PRINTER NAMES UNTESTED
 if %prtnum% == "94A000003-A01" (
-	set printerName="2.0x0.25 - Citizen CLP-631"
+	set printerName="\\waterp01\2.0x0.25 - Citizen CLP-631"
 ) else if %prtnum% == "94A000004-A01" (
-	set printerName="075x25-Citizen CLP-631"
+	set printerName="\\waterp01\075x25-Citizen CLP-631"
 ) else if %prtnum% == "94A000005-A01" (
-	set printerName="ZDesigner 105SL 300DPI"
+	set printerName="\\waterp01\ZDesigner 105SL 300DPI"
 ) else if %prtnum% == "94A000006-A01" (
-	set printerName="1.25x25-Citizen CLP-631"
-) else if %prtnum% == "94A000007-A01" (
-	set printerName=""
-) else if %prtnum% == "94A000009-A01" (
-	set printerName=""
-) else if %prtnum% == "94A000039-A01" (
-	set printerName=""
-) else if %prtnum% == "94A000040-A01" (
-	set printerName=""
-) else if %prtnum% == "94A000041-A01" (
-	set printerName=""
-) else if %prtnum% == "94A000042-A01" (
-	set printerName=""
-) else if %prtnum% == "94A000043-A01" (
-	set printerName=""
-) else if %prtnum% == "94A000044-A01" (
-	set printerName=""
-) else if %prtnum% == "94A000045-A01" (
-	set printerName=""
-) else if %prtnum% == "94A000046-A01" (
-	set printerName=""
+	set printerName="\\waterp01\1.25x25-Citizen CLP-631"
 ) else if %prtnum% == "94A000047-A01" (
-	set printerName="PXS-LP2844-02"
-) else {
+	set printerName="\\waterp01\PXS-LP2844-02"
+	set printerName="\\waterp01\4x6 Shipping Label"
+) else (
 	goto :noMatch
-}
+)
 
 :: prints file, and saves file to folder
 if "%~5" == "" (
-	"%exePath%" -e "%foundFilePath%" "Parm1:%orderNum%" "Parm2:%serialNum%" "Printer_Only:%printerName%" "Use_Saved_Data_Recent:5"
-	"%exePath%" -e "%foundFilePath%" "Parm1:%orderNum%" "Parm2:%serialNum%" "Export_Format:Image" "Export_File:%folderPath%\Label_%reportName%.jpg" "Use_Saved_Data_Recent:5"
+	"%exePath%" -e "%foundFilePath%" "Parm1:%orderNum%" "Parm2:%serialNum%" "Printer:%printerName%" "Export_Format:Printer (Specified)" "Export_File:\\waterp01\PXS-PRN-SHOP-BRTHR" "Use_Saved_Data_Recent:5"
+	"%exePath%" -e "%foundFilePath%" "Parm1:%orderNum%" "Parm2:%serialNum%" "Printer:%printerName%" "Export_Format:Image" "Export_File:%folderPath%\Label_%reportName%.jpg" "Use_Saved_Data_Recent:5"
 ) else ( 
 	if "%~6" == "" (
-		"%exePath%" -e "%foundFilePath%" "Parm1:%orderNum%" "Parm2:%serialNum%" "Parm3:%5" "Printer_Only:%printerName%" "Use_Saved_Data_Recent:5"
-		"%exePath%" -e "%foundFilePath%" "Parm1:%orderNum%" "Parm2:%serialNum%" "Parm3:%5" "Export_Format:Image" "Export_File:%folderPath%\Label_%reportName%.jpg" "Use_Saved_Data_Recent:5"
+		"%exePath%" -e "%foundFilePath%" "Parm1:%orderNum%" "Parm2:%serialNum%" "Parm3:%5" "Printer_Only:%printerName%" "Export_Format:Printer (Specified)" "Export_File:\\waterp01\PXS-PRN-SHOP-BRTHR" "Use_Saved_Data_Recent:5"
+		"%exePath%" -e "%foundFilePath%" "Parm1:%orderNum%" "Parm2:%serialNum%" "Parm3:%5" "Printer_Only:%printerName%" "Export_Format:Image" "Export_File:%folderPath%\Label_%reportName%.jpg" "Use_Saved_Data_Recent:5"
 	) else (
 		if "%~7" == "" (
-			"%exePath%" -e "%foundFilePath%" "Parm1:%orderNum%" "Parm2:%serialNum%" "Parm3:%5" "Parm4:%6" "Printer_Only:%printerName%" "Use_Saved_Data_Recent:5"
-			"%exePath%" -e "%foundFilePath%" "Parm1:%orderNum%" "Parm2:%serialNum%" "Parm3:%5" "Parm4:%6" "Export_Format:Image" "Export_File:%folderPath%\Label_%reportName%.jpg" "Use_Saved_Data_Recent:5"
+			"%exePath%" -e "%foundFilePath%" "Parm1:%orderNum%" "Parm2:%serialNum%" "Parm3:%5" "Parm4:%6" "Printer_Only:%printerName%" "Export_Format:Printer (Specified)" "Export_File:\\waterp01\PXS-PRN-SHOP-BRTHR" "Use_Saved_Data_Recent:5"
+			"%exePath%" -e "%foundFilePath%" "Parm1:%orderNum%" "Parm2:%serialNum%" "Parm3:%5" "Parm4:%6" "Printer_Only:%printerName%" "Export_Format:Image" "Export_File:%folderPath%\Label_%reportName%.jpg" "Use_Saved_Data_Recent:5"
 		) else (
-			"%exePath%" -e "%foundFilePath%" "Parm1:%orderNum%" "Parm2:%serialNum%" "Parm3:%5" "Parm4:%6" "Parm5:%7" "Printer_Only:%printerName%" "Use_Saved_Data_Recent:5"
-			"%exePath%" -e "%foundFilePath%" "Parm1:%orderNum%" "Parm2:%serialNum%" "Parm3:%5" "Parm4:%6" "Parm5:%7" "Export_Format:Image" "Export_File:%folderPath%\Label_%reportName%.jpg" "Use_Saved_Data_Recent:5"
+			"%exePath%" -e "%foundFilePath%" "Parm1:%orderNum%" "Parm2:%serialNum%" "Parm3:%5" "Parm4:%6" "Parm5:%7" "Printer_Only:%printerName%" "Export_Format:Printer (Specified)" "Export_File:\\waterp01\PXS-PRN-SHOP-BRTHR" "Use_Saved_Data_Recent:5"
+			"%exePath%" -e "%foundFilePath%" "Parm1:%orderNum%" "Parm2:%serialNum%" "Parm3:%5" "Parm4:%6" "Parm5:%7" "Printer_Only:%printerName%" "Export_Format:Image" "Export_File:%folderPath%\Label_%reportName%.jpg" "Use_Saved_Data_Recent:5"
 		)
 	)
 )
-
-:: PAGE 270
 
 :noMatch

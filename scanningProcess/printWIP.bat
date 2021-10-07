@@ -7,29 +7,21 @@ set prtnumAbove=%4
 
 set exePath=C:\Program Files (x86)\Visual CUT 11\Visual CUT.exe
 set reportPath=\\WATDBS01\ExactShared\Exact\RMServer\Modified Reports\
+set printerName=\\waterp01\PXS-PRN-SHOP-BRTHR
+:: PXS-PRN-SHOP-BRTHR
 :: the BOM
-"%exePath%" -e "%reportPath%BOMRPTv2.rpt" "Parm1:%prtnumAbove%" "Printer:\\WATERP01.pixus-tech.local\PXS-MXM363N PCL6" "Use_Saved_Data_Recent:5"
+"%exePath%" -e "%reportPath%BOMRPTv2.rpt" "Parm1:%orderNum%" "Export_Format:Printer (Specified)" "Export_File:\\waterp01\PXS-PRN-SHOP-BRTHR" "Use_Saved_Data_Recent:5"
 
 :: the list of serial numbers
-set /a "index = 1"
-if %prtnum% == 02A* (
-    goto :assy
-)
+if /i "%prtnum:~0,3%" == "02A" goto :assy
+
 :part &:: this is for normal parts
-if %index% leq %printNum% (
-	"%exePath%" -e "%reportPath%SerialNumberList_v2.rpt" "Parm1:%orderNum%" "Printer:\\WATERP01.pixus-tech.local\PXS-MXM363N PCL6" "Use_Saved_Data_Recent:5"
-	echo Printing Number %index%
-	set /a "index = index + 1"
-	goto :part
-)
+"%exePath%" -e "%reportPath%SerialNumberList_v2.rpt" "Parm1:%orderNum%" "Export_Format:Printer (Specified)" "Export_File:\\waterp01\PXS-PRN-SHOP-BRTHR" "Print_Copies:%printNum%" "Use_Saved_Data_Recent:5"
+
 goto :config
 :assy &:: this is for parts that are assemblys, which dont have a assembly number
-if %index% leq %printNum% (
-	"%exePath%" -e "%reportPath%SerialNumberList_v3.rpt" "Parm1:%orderNum%" "Printer:\\WATERP01.pixus-tech.local\PXS-MXM363N PCL6" "Use_Saved_Data_Recent:5"
-	echo Printing Number %index%
-	set /a "index = index + 1"
-	goto :assy
-)
+"%exePath%" -e "%reportPath%SerialNumberList_v3.rpt" "Parm1:%orderNum%" "Export_Format:Printer (Specified)" "Export_File:\\waterp01\PXS-PRN-SHOP-BRTHR" "Print_Copies:%printNum%" "Use_Saved_Data_Recent:5"
+
 :config
 :: the configuration sheets
 :: searches for the correct file, then prints
@@ -44,10 +36,13 @@ FOR /R "%searchPath%" %%a  in (%prtnum%*.docx) DO (
 )
 echo Printing -> "%foundFilePath%"
 echo Finished Searching
+if "%~foundFilePath%" == "" (
+    goto :skip
+) 
 call "C:\Program Files\Microsoft Office\root\Office16\WINWORD.EXE" /q /n "%foundFilePath%" /mFilePrintDefault /mFileCloseOrExit /mFileExit 
-
+:skip
 :: dialoge box to indicate it finished printing
 echo.
 echo Finished Printing
 echo.
-timeout 5
+PAUSE
