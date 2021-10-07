@@ -26,7 +26,7 @@ int main(int argc, char* argv[]) {
     bool inDatabase = Contains(barcode); 
     int timesOrderedTotal = 10;
     int timesPrinting = 10;
-    string partNum;
+    string partNum, partNumAbove;
     vector<string> labelReports, labelNames;
 
     // pull data from text file (sql query saves to it every run)
@@ -38,6 +38,7 @@ int main(int argc, char* argv[]) {
         if (ordernum == barcode) {
             line >> partNum;
             line >> timesOrderedTotal;
+            line >> partNumAbove;
             line >> inputProcesser;
             labelNames.push_back(inputProcesser);
             //get rest for note
@@ -153,7 +154,7 @@ int main(int argc, char* argv[]) {
             parm1 = noteParts.at(1);
             s = "printWIPDocuments.bat " + reportName + " " + parm1; 
         }
-        s = "printWIP.bat " + barcode + " " + partNum + " " + to_string(timesPrinting);   
+        s = "printWIP.bat " + barcode + " " + partNum + " " + to_string(timesPrinting) + " " + partNumAbove;
         system( s.c_str() ); 
     }
 }

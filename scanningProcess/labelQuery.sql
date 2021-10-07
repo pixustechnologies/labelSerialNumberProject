@@ -2,7 +2,7 @@ SELECT DISTINCT om.ORDNUM_10,
         CASE pm.TYPE_01 WHEN 'S'        THEN ps.PARPRT_02
                                         ELSE om.PRTNUM_10
         END AS PARPRT,
-om.DUEQTY_10, rd.PRTNUM_11, wn.NOTES_61
+om.DUEQTY_10, om.PRTNUM_10, rd.PRTNUM_11, wn.NOTES_61
 FROM    Requirement_Detail rd, Windows_Notes wn, Order_Master om, Product_Structure ps, Part_Master pm
 WHERE   om.ORDNUM_10 = rd.ORDNUM_11
         AND wn.COMPRT_61 = rd.PRTNUM_11

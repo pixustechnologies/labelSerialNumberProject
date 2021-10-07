@@ -3,11 +3,12 @@
 set orderNum=%1
 set prtnum=%2
 set printNum=%3
+set prtnumAbove=%4
 
 set exePath=C:\Program Files (x86)\Visual CUT 11\Visual CUT.exe
 set reportPath=\\WATDBS01\ExactShared\Exact\RMServer\Modified Reports\
 :: the BOM
-"%exePath%" -e "%reportPath%SHPPAPER.rpt" "Parm1:%orderNum%" "Printer:\\WATERP01.pixus-tech.local\PXS-MXM363N PCL6" "Use_Saved_Data_Recent:5"
+"%exePath%" -e "%reportPath%BOMRPTv2.rpt" "Parm1:%prtnumAbove%" "Printer:\\WATERP01.pixus-tech.local\PXS-MXM363N PCL6" "Use_Saved_Data_Recent:5"
 
 :: the list of serial numbers
 set /a "index = 1"
