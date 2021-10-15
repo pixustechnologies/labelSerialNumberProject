@@ -12,8 +12,9 @@ void addDatabase(string data, int orderedNum);
 void updateDatabase(string barcode, int timesPrinting);
 int SerialNumberGet();
 int alreadyPrintedTimes(string data);
-void printStageTwo(int serialNum, string barcode, vector<string> labelReports, vector<string> partNumber);
+bool printStageTwo(int serialNum, string barcode, vector<string> labelReports, vector<string> partNumber);
 void removeFiles(int startingSN, int endingSN);
+void print075(int serial, int times);
 
 int main(int argc, char* argv[]) {   
     // starts via autohotkey
@@ -28,6 +29,7 @@ int main(int argc, char* argv[]) {
     int timesPrinting = 10;
     string partNum, partNumAbove;
     vector<string> labelReports, labelNames;
+    bool label075 = false;
 
     // pull data from text file (sql query saves to it every run)
     ifstream file("Labels.txt");
@@ -112,9 +114,12 @@ int main(int argc, char* argv[]) {
         // printing all of the labels/documents per serial number, and counting up
         for (int i = 0; i < timesPrinting; i++) {
             int serialNum = SerialNumberGet();
-            printStageTwo(serialNum, barcode, labelReports, labelNames);
+            label075 = printStageTwo(serialNum, barcode, labelReports, labelNames);
             s = "serialNumberCountUp.bat";
             system( s.c_str() );
+        }
+        if (label075){
+            print075(startingSN, timesPrinting);
         }
         cout << "Finished printing\n";
 
@@ -270,9 +275,10 @@ void addDatabase(string data, int orderedNum) {
     bLogOut << data + s << endl;
 }
 
-void printStageTwo(int serialNumber, string orderNumber, vector<string> labelReports, vector<string> partNumber) {
+bool printStageTwo(int serialNumber, string orderNumber, vector<string> labelReports, vector<string> partNumber) {
     // prints the QA sheet, and all of the labels
     string s = "printQA.bat " + orderNumber + " " + to_string(serialNumber);
+    bool label075 = false;
     system( s.c_str() );
     for (int j = 0; j < labelReports.size(); j++) { 
         string reportName, parm1 = "", parm2= "", parm3 = "";
@@ -291,8 +297,13 @@ void printStageTwo(int serialNumber, string orderNumber, vector<string> labelRep
         if(noteParts.size() > 3) 
             parm3 = noteParts.at(3);
         cout << "Printing " << reportName << " report with label " << partNumber[j] << " with parameters:  " + parm1 + " " + parm2 + " " + parm3 ;
-        s = "printLabelsv2.bat " + orderNumber + " " + to_string(serialNumber) + " " + reportName + " " + partNumber[j] + " " + parm1 + " " + parm2 + " " + parm3;
-        system( s.c_str() );
+        if (partNumber[j] == "94A000004-A01") {
+            label075 = true;
+        } else {
+            s = "printLabelsv2.bat " + orderNumber + " " + to_string(serialNumber) + " " + reportName + " " + partNumber[j] + " " + parm1 + " " + parm2 + " " + parm3;
+            system( s.c_str() );
+        }
+        return label075;
     }
 }
 
@@ -304,5 +315,27 @@ void removeFiles(int startingSN, int endingSN) {
         system( s.c_str() );
     }
     s = "removeSQLqueries.bat";
+    system( s.c_str() );
+}
+
+void print075(int startingSN, int times) {
+    string s;
+    int s1=0, s2=0, s3=0, s4=0;
+    for (int i = 0; i < times; i+=4) {
+        if(i%4==0){
+            if(s1!=0){
+                s = "print075Labels.bat " + to_string(s1) + " " + to_string(s2) + " " + to_string(s3) + " " + to_string(s4);
+                system( s.c_str() );
+            } 
+            s1=i;
+        } else if(i%4==1){
+            s2=i;
+        } else if(i%4==2){
+            s3=i;
+        } else if(i%4==3){
+            s4=i;
+        } 
+    }
+    s = "print075Labels.bat " + to_string(s1) + " " + to_string(s2) + " " + to_string(s3) + " " + to_string(s4);
     system( s.c_str() );
 }

@@ -1,4 +1,4 @@
-SELECT DISTINCT om.ORDNUM_10, 
+SELECT  om.ORDNUM_10, 
         CASE pm.TYPE_01 WHEN 'S'        THEN ps.PARPRT_02
                                         ELSE om.PRTNUM_10
         END AS PARPRT,
@@ -11,8 +11,9 @@ WHERE   om.ORDNUM_10 = rd.ORDNUM_11
         AND (LEFT(rd.PRTNUM_11, 3) = '9' + '4' + 'A'
         OR LEFT(rd.PRTNUM_11, 4) = 'K' + '9' + '4' + 'A')
         AND om.DUEQTY_10 > 0 
-        AND (ps.COMPRT_02 = om.PRTNUM_10 OR 1 = 1)
         AND pm.PRTNUM_01 = om.PRTNUM_10
+        AND (ps.COMPRT_02 = CASE pm.TYPE_01 WHEN 'S'    THEN om.PRTNUM_10
+                                                        ELSE '0' + '2' + 'A' + '0' + '0' + '0' + '0' + '2' + '1' + '-' + 'A' + '0' + '1' end)
         AND om.STATUS_10 = '3'
 
 ORDER BY om.ORDNUM_10
