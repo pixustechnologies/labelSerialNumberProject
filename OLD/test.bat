@@ -1,10 +1,12 @@
-
 @echo off
-set prtnum="bL"
-for /f tokens^=* %%i in ('where C:\Users\jwScott\Documents\workspace\labelSerialNumberProject\scanningProcess\%prtnum%*')do set var=%%~nxi 
-::for /f tokens^=* %%i in ('where .:*')do %%~nxi
-for /f "delims=" %%F in ('where %prtnum%*.txt') do set var=%%F
+set exePath=C:\Program Files (x86)\Visual CUT 11\Visual CUT.exe
+set reportPath=\\WATDBS01\ExactShared\Exact\RMServer\Modified Reports\
+set printerName=\\waterp01\1.25x25-Citizen CLP-631
+set orderNum=50004321
+set printNum=1
 
-::printer name?
-echo %var%
+
+"%exePath%" -e "%reportPath%01A000037-A01 INS LBL 1.25x0.25 Serial Number.RPT.rpt" "Parm1:%orderNum%" "Parm2:021430101" "Export_Format:Printer (Specified)" "Export_File:%printerName%" "Print_Copies:%printNum%"
+
+
 PAUSE

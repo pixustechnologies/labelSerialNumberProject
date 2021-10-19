@@ -31,22 +31,22 @@ if %prtnum% == 94A000003-A01 (
 ) else if %prtnum% == 94A000047-A01 (
 	set printerName=\\waterp01\4x6 Shipping Label
 ) else (
+	echo Non-Standard Label Found, please check the BOM for %prtnum%
 	goto :noMatch
 )
 
 :: prints file, and saves file to folder
 if "%~5" == "" (
-	"%exePath%" -e "%foundFilePath%" "Parm1:%orderNum%" "Parm2:%serialNum%" "Printer:%printerName%" "Export_Format:Printer (Specified)" "Export_File:%printerName%" "Use_Saved_Data_Recent:5"
+	"%exePath%" -e "%foundFilePath%" "Parm1:%orderNum%" "Parm2:%serialNum%" "Export_Format:Printer (Specified)" "Export_File:%printerName%" "Use_Saved_Data_Recent:5"
 ) else ( 
 	if "%~6" == "" (
-		"%exePath%" -e "%foundFilePath%" "Parm1:%orderNum%" "Parm2:%serialNum%" "Parm3:%5" "Printer_Only:%printerName%" "Export_Format:Printer (Specified)" "Export_File:%printerName%" "Use_Saved_Data_Recent:5"
+		"%exePath%" -e "%foundFilePath%" "Parm1:%orderNum%" "Parm2:%serialNum%" "Parm3:%5""Export_Format:Printer (Specified)" "Export_File:%printerName%" "Use_Saved_Data_Recent:5"
 	) else (
 		if "%~7" == "" (
-			"%exePath%" -e "%foundFilePath%" "Parm1:%orderNum%" "Parm2:%serialNum%" "Parm3:%5" "Parm4:%6" "Printer_Only:%printerName%" "Export_Format:Printer (Specified)" "Export_File:%printerName%" "Use_Saved_Data_Recent:5"
+			"%exePath%" -e "%foundFilePath%" "Parm1:%orderNum%" "Parm2:%serialNum%" "Parm3:%5" "Parm4:%6" "Export_Format:Printer (Specified)" "Export_File:%printerName%" "Use_Saved_Data_Recent:5"
 		) else (
-			"%exePath%" -e "%foundFilePath%" "Parm1:%orderNum%" "Parm2:%serialNum%" "Parm3:%5" "Parm4:%6" "Parm5:%7" "Printer_Only:%printerName%" "Export_Format:Printer (Specified)" "Export_File:%printerName%" "Use_Saved_Data_Recent:5"
+			"%exePath%" -e "%foundFilePath%" "Parm1:%orderNum%" "Parm2:%serialNum%" "Parm3:%5" "Parm4:%6" "Parm5:%7" "Export_Format:Printer (Specified)" "Export_File:%printerName%" "Use_Saved_Data_Recent:5"
 		)
 	)
 )
-
 :noMatch

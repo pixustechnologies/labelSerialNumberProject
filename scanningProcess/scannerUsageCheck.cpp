@@ -4,16 +4,17 @@
 #include <sstream>
 #include <string.h>
 #include <windows.h>
+#include <cctype>
+#include <algorithm>
 
 using namespace std;
 
 bool Contains(string data);
 void addDatabase(string data, int orderedNum);
 void updateDatabase(string barcode, int timesPrinting);
-int SerialNumberGet();
+string SerialNumberGet();
 int alreadyPrintedTimes(string data);
-bool printStageTwo(int serialNum, string barcode, vector<string> labelReports, vector<string> partNumber);
-void removeFiles(int startingSN, int endingSN);
+bool printStageTwo(string serialNum, string barcode, vector<string> labelReports, vector<string> partNumber);
 void print075(int serial, int times);
 
 int main(int argc, char* argv[]) {   
@@ -36,17 +37,20 @@ int main(int argc, char* argv[]) {
     string fInput, ordernum, inputProcesser;
     while(getline(file, fInput)){
         istringstream line(fInput);
-        line >> ordernum;
+        line >> ordernum; //ORDNUM_10
         if (ordernum == barcode) {
-            line >> partNum;
-            line >> timesOrderedTotal;
-            line >> partNumAbove;
-            line >> inputProcesser;
+            line >> partNum; //PARPRT
+            line >> timesOrderedTotal; //DUEQTY_10
+            line >> partNumAbove; //trash
+            line >> partNumAbove; //PRTNUM_10
+            line >> inputProcesser; //PRTNUM_11
             labelNames.push_back(inputProcesser);
             //get rest for note
             int pos = fInput.find(inputProcesser) + inputProcesser.size() + 1;
             inputProcesser = fInput.substr(pos);
+            inputProcesser.erase(remove_if(inputProcesser.begin(), inputProcesser.end(), ::isspace), inputProcesser.end());
             labelReports.push_back(inputProcesser);
+            //cout << partNum << endl << timesOrderedTotal << endl << partNumAbove << endl << labelNames.back() << endl << labelReports.back() << endl;
         } 
         ordernum="";
     }
@@ -97,7 +101,7 @@ int main(int argc, char* argv[]) {
 
     // main logic:
     string s;
-    int startingSN = SerialNumberGet();
+    int startingSN = stoi(SerialNumberGet());
 
     if (inDatabase) { //if we have seen the barcode before, print labels
         updateDatabase(barcode, timesPrinting);
@@ -113,7 +117,7 @@ int main(int argc, char* argv[]) {
 
         // printing all of the labels/documents per serial number, and counting up
         for (int i = 0; i < timesPrinting; i++) {
-            int serialNum = SerialNumberGet();
+            string serialNum = SerialNumberGet();
             label075 = printStageTwo(serialNum, barcode, labelReports, labelNames);
             s = "serialNumberCountUp.bat";
             system( s.c_str() );
@@ -130,19 +134,46 @@ int main(int argc, char* argv[]) {
             if (yesno == "a") {
                 for (int i = 0; i < timesPrinting; i++) {
                     int serialNum = startingSN + i;
-                    printStageTwo(serialNum, barcode, labelReports, labelNames);
-                }           
+                    printStageTwo(to_string(serialNum), barcode, labelReports, labelNames);
+                }      
+                if (label075){
+                    print075(startingSN, timesPrinting);
+                }     
             } else if (yesno == "1") {
                 string sn;
                 cout << "Which Serial Number?\n";
                 cin >> sn;
-                printStageTwo(stoi(sn), barcode, labelReports, labelNames);
+                string s = "printQA.bat " + barcode + " " + sn;
+                system( s.c_str() );
+                for (int j = 0; j < labelReports.size(); j++) { 
+                    string reportName, parm1 = "", parm2= "", parm3 = "";
+                    string token;
+                    vector<string> noteParts;
+                    istringstream iss(labelReports[j]);
+                    // parses with ? as the delimiter, up to 3 parameters 
+                    while ( getline(iss, token, '?') ) { 
+                        noteParts.push_back(token);
+                    }
+                    reportName = noteParts.at(0);
+                    if(noteParts.size() > 1) 
+                        parm1 = noteParts.at(1);
+                    if(noteParts.size() > 2) 
+                        parm2 = noteParts.at(2);
+                    if(noteParts.size() > 3) 
+                        parm3 = noteParts.at(3);
+                    cout << "Do you want to print " << reportName << " report with label " << labelNames[j] << " with parameters:  " + parm1 + " " + parm2 + " " + parm3 << " [y/n]" << endl;
+                    string responce;
+                    cin >> responce;
+                    if (responce == "y") {
+                        s = "printLabelsv2.bat " + barcode + " " + sn + " " + reportName + " " + labelNames[j] + " " + parm1 + " " + parm2 + " " + parm3;
+                        system( s.c_str() );
+                    }
+                }
             }
             cout << "Finished printing\n";
         } while (yesno != "n");
-        
-        removeFiles(startingSN, SerialNumberGet());
-        
+        s = "removeSQLqueries.bat";
+        system( s.c_str() );
     } else { // haven't seen the barcode before, so print BOM, config, SN list
         if (!Contains(barcode)) { // *maybe they reverted, so cant assume it isnt there
             addDatabase(barcode, timesOrderedTotal);
@@ -161,6 +192,7 @@ int main(int argc, char* argv[]) {
             parm1 = noteParts.at(1);
             s = "printWIPDocuments.bat " + reportName + " " + parm1; 
         }
+        
         s = "printWIP.bat " + barcode + " " + partNum + " " + to_string(timesPrinting) + " " + partNumAbove;
         system( s.c_str() ); 
     }
@@ -203,11 +235,11 @@ int alreadyPrintedTimes(string data) {
     return 0;
 }
 
-int SerialNumberGet() {
+string SerialNumberGet() {
     // gets the serial number from the text file
     ifstream file("serialNumberCount.txt");
     string input;
-    int serialNumber;
+    string serialNumber;
     while(getline(file, input)){
         istringstream line(input);
         line >> serialNumber;
@@ -275,9 +307,9 @@ void addDatabase(string data, int orderedNum) {
     bLogOut << data + s << endl;
 }
 
-bool printStageTwo(int serialNumber, string orderNumber, vector<string> labelReports, vector<string> partNumber) {
+bool printStageTwo(string serialNumber, string orderNumber, vector<string> labelReports, vector<string> partNumber) {
     // prints the QA sheet, and all of the labels
-    string s = "printQA.bat " + orderNumber + " " + to_string(serialNumber);
+    string s = "printQA.bat " + orderNumber + " " + serialNumber;
     bool label075 = false;
     system( s.c_str() );
     for (int j = 0; j < labelReports.size(); j++) { 
@@ -296,46 +328,39 @@ bool printStageTwo(int serialNumber, string orderNumber, vector<string> labelRep
             parm2 = noteParts.at(2);
         if(noteParts.size() > 3) 
             parm3 = noteParts.at(3);
-        cout << "Printing " << reportName << " report with label " << partNumber[j] << " with parameters:  " + parm1 + " " + parm2 + " " + parm3 ;
-        if (partNumber[j] == "94A000004-A01") {
+        cout << "Printing " << reportName << " report with label " << partNumber[j] << " with parameters:  " + parm1 + " " + parm2 + " " + parm3 << endl;
+        if (reportName == "01A000199-A01") { // add new "by 4" formats for 075 here
             label075 = true;
         } else {
-            s = "printLabelsv2.bat " + orderNumber + " " + to_string(serialNumber) + " " + reportName + " " + partNumber[j] + " " + parm1 + " " + parm2 + " " + parm3;
+            s = "printLabelsv2.bat " + orderNumber + " " + serialNumber + " " + reportName + " " + partNumber[j] + " " + parm1 + " " + parm2 + " " + parm3;
             system( s.c_str() );
         }
-        return label075;
     }
+    return label075;
 }
 
-void removeFiles(int startingSN, int endingSN) {
-    // removes the folder for each serial number's label files
-    string s;
-    for (int i = startingSN; i < endingSN; i++) {
-        s = "deleteSavedFiles.bat " + i;
-        system( s.c_str() );
-    }
-    s = "removeSQLqueries.bat";
-    system( s.c_str() );
-}
 
 void print075(int startingSN, int times) {
+    // prints out the 075 serial numbers 
+    // reconfigure this function if another by4 format is needed
+    // ASSUMES PLANT 0
     string s;
-    int s1=0, s2=0, s3=0, s4=0;
-    for (int i = 0; i < times; i+=4) {
+    string s1="0", s2="0", s3="0", s4="0";
+    for (int i = startingSN; i < startingSN+times; i+=4) {
         if(i%4==0){
-            if(s1!=0){
-                s = "print075Labels.bat " + to_string(s1) + " " + to_string(s2) + " " + to_string(s3) + " " + to_string(s4);
+            if(s1!="0"){
+                s = "print075Labels.bat " + s1 + " " + s2 + " " + s3 + " " + s4;
                 system( s.c_str() );
             } 
-            s1=i;
+            s1="0" + i;
         } else if(i%4==1){
-            s2=i;
+            s2="0" + i;
         } else if(i%4==2){
-            s3=i;
+            s3="0" + i;
         } else if(i%4==3){
-            s4=i;
+            s4="0" + i;
         } 
     }
-    s = "print075Labels.bat " + to_string(s1) + " " + to_string(s2) + " " + to_string(s3) + " " + to_string(s4);
+    s = "print075Labels.bat " + s1 + " " + s2 + " " + s3 + " " + s4;
     system( s.c_str() );
 }

@@ -1,8 +1,7 @@
 @echo off
 :: takes in ORDNUM_10, Serial Number, Report Name, and Input Specification
 set serialNum=%1
-:: UPDATE DOC NUMBER
-set reportName=01A000042-A01 INS LBL 0.75x0.25 Serial Number Smallv2
+set reportName=01A000199-A01 INS LBL 0.75x0.25 Serial Number Small by 4
 
 set exePath=C:\Program Files (x86)\Visual CUT 11\Visual CUT.exe
 :: searches for the file path where the report is stored
