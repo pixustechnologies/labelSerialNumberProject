@@ -20,7 +20,7 @@ void print075(int serial, int times);
 int main(int argc, char* argv[]) {   
     // starts via autohotkey
     // scanner types into console
-    string barcode;
+    string barcode, trash;
     barcode = argv[1];
     cout << barcode << endl;
 
@@ -28,7 +28,7 @@ int main(int argc, char* argv[]) {
     bool inDatabase = Contains(barcode); 
     int timesOrderedTotal = 10;
     int timesPrinting = 10;
-    string partNum, partNumAbove;
+    string partNum, partNumAboveTemp, partNumAbove;
     vector<string> labelReports, labelNames;
     bool label075 = false;
 
@@ -41,14 +41,18 @@ int main(int argc, char* argv[]) {
         if (ordernum == barcode) {
             line >> partNum; //PARPRT
             line >> timesOrderedTotal; //DUEQTY_10
-            line >> partNumAbove; //trash
-            line >> partNumAbove; //PRTNUM_10
+            line >> trash; //trash
+            line >> partNumAboveTemp; //PRTNUM_10
+            if (partNumAbove != partNumAboveTemp) {
+                labelNames.clear();
+                labelReports.clear();
+            }
+            partNumAbove = partNumAboveTemp;
             line >> inputProcesser; //PRTNUM_11
             labelNames.push_back(inputProcesser);
             //get rest for note
             int pos = fInput.find(inputProcesser) + inputProcesser.size() + 1;
             inputProcesser = fInput.substr(pos);
-            inputProcesser.erase(remove_if(inputProcesser.begin(), inputProcesser.end(), ::isspace), inputProcesser.end());
             labelReports.push_back(inputProcesser);
             //cout << partNum << endl << timesOrderedTotal << endl << partNumAbove << endl << labelNames.back() << endl << labelReports.back() << endl;
         } 
@@ -61,9 +65,15 @@ int main(int argc, char* argv[]) {
         istringstream line(fInput);
         line >> ordernum;
         if (ordernum == barcode) {
-            line >> inputProcesser;
-            line >> inputProcesser;
-            line >> inputProcesser;
+            line >> partNum;
+            line >> timesOrderedTotal;
+            line >> trash; //trash
+            line >> inputProcesser; //PRTNUM_10
+            partNumAboveTemp = inputProcesser;
+            if (partNumAbove != partNumAboveTemp) {
+                documentReports.clear();
+            }
+            partNumAbove = partNumAboveTemp;
             //get rest for note
             int pos = fInput.find(inputProcesser) + inputProcesser.size() + 1;
             inputProcesser = fInput.substr(pos);
@@ -72,6 +82,25 @@ int main(int argc, char* argv[]) {
         ordernum="";
     }
     file2.close();
+
+    if (labelReports.size() == 0 || documentReports.size() == 0 ) {
+        // pull data from text file (sql query saves to it every run)
+        ifstream file3("Orders.txt");
+        while(getline(file3, fInput)){
+            istringstream line(fInput);
+            line >> ordernum; //ORDNUM_10
+            if (ordernum == barcode) {
+                line >> partNum; //PARPRT
+                line >> timesOrderedTotal; //DUEQTY_10
+                line >> trash; //trash
+                line >> partNumAbove; //PRTNUM_10
+                //cout << partNum << endl << timesOrderedTotal << endl << partNumAbove << endl << labelNames.back() << endl << labelReports.back() << endl;
+            } 
+            ordernum="";
+        }
+        file3.close();
+    }
+
 
     // asks if the user would like to revert to the first stage, or continue
     string yesno;
@@ -140,10 +169,14 @@ int main(int argc, char* argv[]) {
                     print075(startingSN, timesPrinting);
                 }     
             } else if (yesno == "1") {
-                string sn;
+                string sn, s, responce;
                 cout << "Which Serial Number?\n";
                 cin >> sn;
-                string s = "printQA.bat " + barcode + " " + sn;
+                cout << "Do you want to print the QA Sheet? [y/n]\n";
+                cin >> responce;
+                if (responce == "y"){
+                    s = "printQA.bat " + barcode + " " + sn;
+                }
                 system( s.c_str() );
                 for (int j = 0; j < labelReports.size(); j++) { 
                     string reportName, parm1 = "", parm2= "", parm3 = "";
@@ -161,8 +194,11 @@ int main(int argc, char* argv[]) {
                         parm2 = noteParts.at(2);
                     if(noteParts.size() > 3) 
                         parm3 = noteParts.at(3);
-                    cout << "Do you want to print " << reportName << " report with label " << labelNames[j] << " with parameters:  " + parm1 + " " + parm2 + " " + parm3 << " [y/n]" << endl;
-                    string responce;
+                    if(noteParts.size() > 4) 
+                        trash = noteParts.at(4);
+                    reportName.erase(remove_if(reportName.begin(), reportName.end(), ::isspace), reportName.end());
+                    cout << "Do you want to print " << reportName << " report with label " << labelNames[j] << " with parameters: " + parm1 + " " + parm2 + " " + parm3 << " [y/n]" << endl;
+                    
                     cin >> responce;
                     if (responce == "y") {
                         s = "printLabelsv2.bat " + barcode + " " + sn + " " + reportName + " " + labelNames[j] + " " + parm1 + " " + parm2 + " " + parm3;
@@ -313,7 +349,7 @@ bool printStageTwo(string serialNumber, string orderNumber, vector<string> label
     bool label075 = false;
     system( s.c_str() );
     for (int j = 0; j < labelReports.size(); j++) { 
-        string reportName, parm1 = "", parm2= "", parm3 = "";
+        string reportName, parm1 = "", parm2= "", parm3 = "", trash = "";
         string token;
         vector<string> noteParts;
         istringstream iss(labelReports[j]);
@@ -328,6 +364,10 @@ bool printStageTwo(string serialNumber, string orderNumber, vector<string> label
             parm2 = noteParts.at(2);
         if(noteParts.size() > 3) 
             parm3 = noteParts.at(3);
+        if(noteParts.size() > 4) 
+            trash = noteParts.at(4);
+            
+        reportName.erase(remove_if(reportName.begin(), reportName.end(), ::isspace), reportName.end());
         cout << "Printing " << reportName << " report with label " << partNumber[j] << " with parameters:  " + parm1 + " " + parm2 + " " + parm3 << endl;
         if (reportName == "01A000199-A01") { // add new "by 4" formats for 075 here
             label075 = true;

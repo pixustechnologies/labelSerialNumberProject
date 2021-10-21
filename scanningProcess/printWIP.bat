@@ -9,7 +9,7 @@ set exePath=C:\Program Files (x86)\Visual CUT 11\Visual CUT.exe
 set reportPath=\\WATDBS01\ExactShared\Exact\RMServer\Modified Reports\
 set printerName=\\waterp01\PXS-PRN-SHOP-BRTHR
 :: the BOM
-"%exePath%" -e "%reportPath%BOMRPTv2.rpt" "Parm1:%orderNum%" "Export_Format:Printer (Specified)" "Export_File:%printerName%" "Use_Saved_Data_Recent:5"
+"%exePath%" -e "%reportPath%BOMRPTv2.rpt" "Parm1:%prtnumAbove%" "Export_Format:Printer (Specified)" "Export_File:%printerName%" "Use_Saved_Data_Recent:5"
 
 :: the list of serial numbers
 if /i "%prtnum:~0,3%" == "02A" goto :assy
@@ -34,7 +34,7 @@ FOR /R "%searchPath%" %%a  in (%prtnum%*.docx) DO (
         SET foundFilePath=%%~fa
     )
 )
-echo Printing -> "%foundFilePath%"
+echo Printing "%foundFilePath%"
 echo Finished Searching
 if "%~foundFilePath%" == "" (
     goto :skip
