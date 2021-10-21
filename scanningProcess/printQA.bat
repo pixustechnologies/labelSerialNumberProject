@@ -3,10 +3,6 @@
 set orderNum=%1
 set serialNum=%2
 
-:: makes a new folder for the current set of documents
-set folderPath=\\WATNAS\Production\Saved_Labels\%serialNum%
-mkdir %folderPath%
-
 :: QA sheet printing, and saving of file
 set exePath="C:\Program Files (x86)\Visual CUT 11\Visual CUT.exe"
 set reportName="\\WATDBS01\ExactShared\Exact\RMServer\Modified Reports\QAInspectionv22.rpt"
