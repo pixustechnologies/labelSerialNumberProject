@@ -35,7 +35,7 @@ if %prtnum% == 94A000003-A01 (
 	goto :noMatch
 )
 
-:: prints file, and saves file to folder
+:: prints file
 if "%~5" == "" (
 	"%exePath%" -e "%foundFilePath%" "Parm1:%orderNum%" "Parm2:%serialNum%" "Export_Format:Printer (Specified)" "Export_File:%printerName%" "Use_Saved_Data_Recent:5"
 ) else ( 

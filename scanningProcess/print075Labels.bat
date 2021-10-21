@@ -1,5 +1,5 @@
 @echo off
-:: takes in ORDNUM_10, Serial Number, Report Name, and Input Specification
+:: takes in Serial Number
 set serialNum=%1
 set reportName=01A000199-A01 INS LBL 0.75x0.25 Serial Number Small by 4
 
@@ -16,7 +16,7 @@ FOR /R "%searchPath%" %%a  in (%reportName%*.rpt) DO (
 
 set printerName="\\waterp01\075x25-Citizen CLP-631"
 
-:: prints file, and saves file to folder
+:: prints file
 if "%~2" == "" (
 	"%exePath%" -e "%foundFilePath%" "Parm1:%1" "Export_Format:Printer (Specified)" "Export_File:%printerName%" "Use_Saved_Data_Recent:5"
 ) else ( 

@@ -7,7 +7,8 @@ FROM    Requirement_Detail rd, Windows_Notes wn, Order_Master om, Product_Struct
 WHERE   om.ORDNUM_10 = rd.ORDNUM_11
         AND wn.COMPRT_61 = rd.PRTNUM_11
         AND LEFT(om.ORDNUM_10, 1) = '5'
-        AND rd.PRTNUM_11 = 'D' + 'o' + 'c' + 'u'  + 'm'  + 'e'  + 'n'  + 't'  + ' '  + 'B'  + 'O'  + 'M' 
+        AND (rd.PRTNUM_11 = 'I' + 'n' + 'i' + 't'  + 'i'  + 'a'  + 'l'  + ' '  + 'D'  + 'O'  + 'C' + 'S'
+        OR rd.PRTNUM_11 = 'F' + 'i' + 'n' + 'a'  + 'l'  + ' '  + 'D'  + 'O'  + 'C' + 'S' )
         AND om.DUEQTY_10 > 0 
         AND pm.PRTNUM_01 = ps.COMPRT_02
         AND ps.PARPRT_02 = om.PRTNUM_10

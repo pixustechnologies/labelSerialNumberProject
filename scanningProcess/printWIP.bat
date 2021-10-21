@@ -1,5 +1,5 @@
 @echo off
-:: takes in ORDNUM_10, PRTNUM_10, and DUEQTY_10
+:: takes in ORDNUM_10, PRTNUM_10, DUEQTY_10, PRTNUM_11
 set orderNum=%1
 set prtnum=%2
 set printNum=%3
