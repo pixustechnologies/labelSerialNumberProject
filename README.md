@@ -25,6 +25,7 @@ TECH DEBT:
 - Set paper printer to default to duplex
 - INSTALL SQL SERVER 2019, download x86 and x64 and seperate installer? 
 - update file paths with respective user
+- DONT change any settings in Visual CUT, as the commandline only overrides a few of them and can cause unpredicted behaviour
 - Silent PDF printing:
     - https://stackoverflow.com/questions/19124808/printing-pdfs-from-windows-command-line
     - http://www.columbia.edu/~em36/pdftoprinter.html

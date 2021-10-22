@@ -5,7 +5,7 @@ set reportName=01A000199-A01 INS LBL 0.75x0.25 Serial Number Small by 4
 
 set exePath=C:\Program Files (x86)\Visual CUT 11\Visual CUT.exe
 :: searches for the file path where the report is stored
-set searchPath=\\WATDBS01\ExactShared\Exact\RMServer\Modified Reports\
+set searchPath=\\WATNAS\Production\Manufacturing Instructions\Crystal Label Reports
 set foundFilePath=
 FOR /R "%searchPath%" %%a  in (%reportName%*.rpt) DO (
     IF EXIST "%%~fa" (

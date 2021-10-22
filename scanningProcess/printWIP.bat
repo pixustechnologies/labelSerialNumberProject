@@ -6,7 +6,7 @@ set printNum=%3
 set prtnumAbove=%4
 
 set exePath=C:\Program Files (x86)\Visual CUT 11\Visual CUT.exe
-set reportPath=\\WATDBS01\ExactShared\Exact\RMServer\Modified Reports\
+set reportPath=\\WATDBS01\ExactShared\Shop Order Processing\
 set printerName=\\waterp01\PXS-PRN-SHOP-BRTHR
 :: the BOM
 "%exePath%" -e "%reportPath%BOMRPTv2.rpt" "Parm1:%prtnumAbove%" "Export_Format:Printer (Specified)" "Export_File:%printerName%" "Use_Saved_Data_Recent:5"

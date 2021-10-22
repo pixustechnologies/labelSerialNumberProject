@@ -15,7 +15,7 @@ void updateDatabase(string barcode, int timesPrinting);
 string SerialNumberGet();
 int alreadyPrintedTimes(string data);
 bool printStageTwo(string serialNum, string barcode, vector<string> labelReports, vector<string> partNumber);
-void printStageTwoDocuments(string serialNum, vector<string> documentType, vector<string> documentReport);
+void printStageTwoDocuments(string barcode, string serialNum, vector<string> documentType, vector<string> documentReport);
 void print075(int serial, int times);
 
 int main(int argc, char* argv[]) {   
@@ -155,7 +155,7 @@ int main(int argc, char* argv[]) {
         for (int i = 0; i < timesPrinting; i++) {
             string serialNum = SerialNumberGet();
             label075 = printStageTwo(serialNum, barcode, labelReports, labelNames);
-            printStageTwoDocuments(serialNum, documentType, documentReports);
+            printStageTwoDocuments(barcode, serialNum, documentType, documentReports);
             s = "serialNumberCountUp.bat";
             system( s.c_str() );
         }
@@ -174,7 +174,7 @@ int main(int argc, char* argv[]) {
                 for (int i = 0; i < timesPrinting; i++) {
                     int serialNum = startingSN + i;
                     printStageTwo(to_string(serialNum), barcode, labelReports, labelNames);
-                    printStageTwoDocuments(to_string(serialNum), documentType, documentReports);
+                    printStageTwoDocuments(barcode, to_string(serialNum), documentType, documentReports);
                 }      
                 if (label075){
                     print075(startingSN, timesPrinting);
@@ -235,7 +235,7 @@ int main(int argc, char* argv[]) {
         if (!Contains(barcode)) { // *maybe they reverted, so cant assume it isnt there
             addDatabase(barcode, timesOrderedTotal);
         }
-        printStageTwoDocuments(0, documentType, documentReports);
+        printStageTwoDocuments(barcode, 0, documentType, documentReports);
         s = "printWIP.bat " + barcode + " " + partNum + " " + to_string(timesPrinting) + " " + partNumAbove;
         system( s.c_str() ); 
     }
@@ -412,7 +412,7 @@ void print075(int startingSN, int times) {
     system( s.c_str() );
 }
 
-void printStageTwoDocuments(string serialNum, vector<string> documentType, vector<string> documentName) {
+void printStageTwoDocuments(string barcode, string serialNum, vector<string> documentType, vector<string> documentName) {
     // prints out all of the documents related to post production
     for (int i = 0; i < documentType.size(); i++) {
         string reportName, parm1 = "", s, token;
@@ -427,7 +427,7 @@ void printStageTwoDocuments(string serialNum, vector<string> documentType, vecto
         if (documentType.at(i) == "Initial DOCS") {
             s = "printWIPDocuments.bat " + reportName + " " + parm1; 
         } else if (documentType.at(i) == "Final DOCS") {
-            s = "printSerialDocuments.bat " + serialNum + " " + reportName + " " + parm1; 
+            s = "printSerialDocuments.bat " + barcode + " " + serialNum + " " + reportName + " " + parm1; 
         }
     }
 }

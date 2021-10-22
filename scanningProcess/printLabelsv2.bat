@@ -8,7 +8,7 @@ set prtnum=%4
 set folderPath=\\WATNAS\Production\Saved_Labels\%serialNum%
 set exePath=C:\Program Files (x86)\Visual CUT 11\Visual CUT.exe
 :: searches for the file path where the report is stored
-set searchPath=\\WATDBS01\ExactShared\Exact\RMServer\Modified Reports\
+set searchPath=\\WATNAS\Production\Manufacturing Instructions\Crystal Label Reports
 set foundFilePath=
 FOR /R "%searchPath%" %%a  in (%reportName%*.rpt) DO (
     IF EXIST "%%~fa" (

@@ -17,6 +17,5 @@ FOR /R "%searchPath%" %%a  in (*%documentName%*) DO (
 
 :: prints out the crystal report
 set exePath="C:\Program Files (x86)\Visual CUT 11\Visual CUT.exe"
-set reportName="\\WATDBS01\ExactShared\Exact\RMServer\Modified Reports\QAInspectionv22.rpt"
 set printerName=\\waterp01\PXS-PRN-SHOP-BRTHR
 %exePath% -e %foundFilePath% "Parm1:%orderNum%" "Parm2:%serialNum%" "Export_Format:Printer (Specified)" "Export_File:%printerName%" "Use_Saved_Data_Recent:5"
