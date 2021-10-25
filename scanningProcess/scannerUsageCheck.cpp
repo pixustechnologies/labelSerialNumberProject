@@ -21,10 +21,18 @@ void print075(int serial, int times);
 int main(int argc, char* argv[]) {   
     // starts via autohotkey
     // scanner types into console
-    string barcode, trash;
+    string barcode, trash = "y";
     barcode = argv[1];
-    cout << barcode << endl;
-
+    // allows the user to change the SQL query before the program starts
+    cout << "Pixus Technologies Label Printer" << endl << "Confirm that this is your barcode: " << barcode << " [y]" << endl;
+    cin >> trash;
+    if (trash != "y") {
+        cout << "Closing..." << endl;
+        string s = "removeSQLqueries.bat";
+        system( s.c_str() );
+        Sleep(3000);
+        exit(1);
+    }
     // checks if the barcode is in the database already
     bool inDatabase = Contains(barcode); 
     int timesOrderedTotal = 10;
@@ -59,6 +67,7 @@ int main(int argc, char* argv[]) {
             inputProcesser.erase(0, inputProcesser.find_first_not_of(" \n\r\t"));
             labelReports.push_back(inputProcesser);
             //cout << partNum << endl << timesOrderedTotal << endl << partNumAbove << endl << labelNames.back() << endl << labelReports.back() << endl;
+            //cout << "START" << labelReports.back() << "END" << endl;
         } 
         ordernum="";
     }
@@ -136,8 +145,8 @@ int main(int argc, char* argv[]) {
     }
 
     // main logic:
-    string s;
-    int startingSN = stoi(SerialNumberGet());
+    string s, startingSNString = SerialNumberGet();
+    int startingSN = stoi(startingSNString);
 
     if (inDatabase) { //if we have seen the barcode before, print labels
         updateDatabase(barcode, timesPrinting);
@@ -183,47 +192,52 @@ int main(int argc, char* argv[]) {
                 string sn, s, responce;
                 cout << "Which Serial Number?\n";
                 cin >> sn;
-                for (int j = 0; j < labelReports.size(); j++) { 
-                    string reportName, parm1 = "", parm2= "", parm3 = "", token;
-                    vector<string> noteParts;
-                    istringstream iss(labelReports[j]);
-                    // parses with ? as the delimiter, up to 3 parameters 
-                    while ( getline(iss, token, '?') ) { 
-                        noteParts.push_back(token);
+                if (sn[0] != startingSNString[0] && sn[1] != startingSNString[1] && 
+                    sn[2] != startingSNString[2] && sn[3] != startingSNString[3] && sn[4] != startingSNString[4]) {
+                        cout << "This Serial Number is not correct\n";
+                } else {
+                    for (int j = 0; j < labelReports.size(); j++) { 
+                        string reportName, parm1 = "", parm2= "", parm3 = "", token;
+                        vector<string> noteParts;
+                        istringstream iss(labelReports[j]);
+                        // parses with ? as the delimiter, up to 3 parameters 
+                        while ( getline(iss, token, '?') ) { 
+                            noteParts.push_back(token);
+                        }
+                        reportName = noteParts.at(0);
+                        if(noteParts.size() > 1) 
+                            parm1 = noteParts.at(1);
+                        if(noteParts.size() > 2) 
+                            parm2 = noteParts.at(2);
+                        if(noteParts.size() > 3) 
+                            parm3 = noteParts.at(3);
+                        if(noteParts.size() > 4) 
+                            trash = noteParts.at(4);
+                        reportName.erase(reportName.find_last_not_of(" \n\r\t")+1);
+                        cout << "Do you want to print " << reportName << " report with label " << labelNames[j] << " with parameters: " + parm1 + " " + parm2 + " " + parm3 << " [y/n]" << endl;
+                        
+                        cin >> responce;
+                        if (responce == "y") {
+                            s = "printLabelsv2.bat " + barcode + " " + sn + " " + reportName + " " + labelNames[j] + " \"" + parm1 + "\" \"" + parm2 + "\" \"" + parm3 + "\"";
+                            system( s.c_str() );
+                        }
                     }
-                    reportName = noteParts.at(0);
-                    if(noteParts.size() > 1) 
-                        parm1 = noteParts.at(1);
-                    if(noteParts.size() > 2) 
-                        parm2 = noteParts.at(2);
-                    if(noteParts.size() > 3) 
-                        parm3 = noteParts.at(3);
-                    if(noteParts.size() > 4) 
-                        trash = noteParts.at(4);
-                    reportName.erase(reportName.find_last_not_of(" \n\r\t")+1);
-                    cout << "Do you want to print " << reportName << " report with label " << labelNames[j] << " with parameters: " + parm1 + " " + parm2 + " " + parm3 << " [y/n]" << endl;
-                    
-                    cin >> responce;
-                    if (responce == "y") {
-                        s = "printLabelsv2.bat " + barcode + " " + sn + " " + reportName + " " + labelNames[j] + " " + parm1 + " " + parm2 + " " + parm3;
-                        system( s.c_str() );
-                    }
-                }
-                for (int i = 0; i < documentType.size(); i++) {
-                    string reportPath, reportName, s, token;
-                    vector<string> noteParts;
-                    istringstream iss(documentReports[i]);
-                    // parses with ? as the delimiter, up to 3 parameters 
-                    while ( getline(iss, token, '?') ) { 
-                        noteParts.push_back(token);
-                    }
-                    reportPath = noteParts.at(0);
-                    reportName = noteParts.at(1);
-                    cout << "Do you want to print " << reportName << " report under path " << reportPath << " [y/n]" << endl;
-                    cin >> responce;
-                    if (responce == "y" && documentType.at(i) == "Final DOCS") {
-                        s = "printSerialDocuments.bat " + barcode + " " + sn + " " + reportPath + " " + reportName;
-                        system( s.c_str() );
+                    for (int i = 0; i < documentType.size(); i++) {
+                        string reportPath, reportName, s, token;
+                        vector<string> noteParts;
+                        istringstream iss(documentReports[i]);
+                        // parses with ? as the delimiter, up to 3 parameters 
+                        while ( getline(iss, token, '?') ) { 
+                            noteParts.push_back(token);
+                        }
+                        reportPath = noteParts.at(0);
+                        reportName = noteParts.at(1);
+                        cout << "Do you want to print " << reportName << " report under path " << reportPath << " [y/n]" << endl;
+                        cin >> responce;
+                        if (responce == "y" && documentType.at(i) == "Final DOCS") {
+                            s = "printSerialDocuments.bat " + barcode + " " + sn + " \"" + reportPath + "\" " + reportName;
+                            system( s.c_str() );
+                        }
                     }
                 }
             }
@@ -235,7 +249,7 @@ int main(int argc, char* argv[]) {
         if (!Contains(barcode)) { // *maybe they reverted, so cant assume it isnt there
             addDatabase(barcode, timesOrderedTotal);
         }
-        printStageTwoDocuments(barcode, 0, documentType, documentReports);
+        printStageTwoDocuments(barcode, "0", documentType, documentReports);
         s = "printWIP.bat " + barcode + " " + partNum + " " + to_string(timesPrinting) + " " + partNumAbove;
         system( s.c_str() ); 
     }
@@ -371,13 +385,11 @@ bool printStageTwo(string serialNumber, string orderNumber, vector<string> label
             parm3 = noteParts.at(3);
         if(noteParts.size() > 4) 
             trash = noteParts.at(4);
-            
-        reportName.erase(remove_if(reportName.begin(), reportName.end(), ::isspace), reportName.end());
-        cout << "Printing " << reportName << " report with label " << partNumber[j] << " with parameters:  " + parm1 + " " + parm2 + " " + parm3 << endl;
+        cout << "Printing " << reportName << " report with label " << partNumber[j] << " with parameters: " + parm1 + " " + parm2 + " " + parm3 << endl;
         if (reportName == "01A000199-A01") { // add new "by 4" formats for 075 here
             label075 = true;
         } else {
-            s = "printLabelsv2.bat " + orderNumber + " " + serialNumber + " " + reportName + " " + partNumber[j] + " " + parm1 + " " + parm2 + " " + parm3;
+            s = "printLabelsv2.bat " + orderNumber + " " + serialNumber + " " + reportName + " " + partNumber[j] + " \"" + parm1 + "\" \"" + parm2 + "\" \"" + parm3 + "\"";
             system( s.c_str() );
         }
     }
@@ -385,7 +397,6 @@ bool printStageTwo(string serialNumber, string orderNumber, vector<string> label
 
     return label075;
 }
-
 
 void print075(int startingSN, int times) {
     // prints out the 075 serial numbers 
@@ -425,9 +436,9 @@ void printStageTwoDocuments(string barcode, string serialNum, vector<string> doc
         reportName = noteParts.at(0);
         parm1 = noteParts.at(1);
         if (documentType.at(i) == "Initial DOCS") {
-            s = "printWIPDocuments.bat " + reportName + " " + parm1; 
+            s = "printWIPDocuments.bat " + reportName + " \"" + parm1 + "\""; 
         } else if (documentType.at(i) == "Final DOCS") {
-            s = "printSerialDocuments.bat " + barcode + " " + serialNum + " " + reportName + " " + parm1; 
+            s = "printSerialDocuments.bat " + barcode + " " + serialNum + " " + reportName + " \"" + parm1 + "\""; 
         }
     }
 }

@@ -3,6 +3,7 @@
 set orderNum=%1
 set serialNum=%2
 set searchPath=%3
+set searchPath=%searchPath:"=%
 set documentName=%4
 
 :: searchs for the document
