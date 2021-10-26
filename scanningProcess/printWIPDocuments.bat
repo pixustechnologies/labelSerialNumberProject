@@ -1,6 +1,7 @@
 @echo off
 :: takes in a search path, and the document number 
 set searchPath=%1
+set searchPath=%searchPath:"=%
 set documentName=%2
 
 :: searchs for the document

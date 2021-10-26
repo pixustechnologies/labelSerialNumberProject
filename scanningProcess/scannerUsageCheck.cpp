@@ -122,20 +122,20 @@ int main(int argc, char* argv[]) {
     string yesno;
     timesPrinting = timesOrderedTotal;
     if (inDatabase) {
-        cout << "Second step: \n Printing QA Sheets and Labels \n"
-             << "Revert to Assembly Documents + Serial Number List printing? (y/n)\n";
+        cout << "Second step: \nPrinting QA Sheets and Labels \n"
+             << "Would you like to reprint the BOM + Assembly Documents + Serial Number List instead? (y/n)\n";
         cin >> yesno;
         if (yesno == "y") {
             inDatabase = false;
-            cout << "First step: \n Printing the BOM, Configuration sheet, and multiple Serial Number Lists \n";
+            cout << "First step: \nPrinting the BOM, Assembly Documents, Configuration Sheet, and multiple Serial Number Lists \n";
         } else {
             timesPrinting -= alreadyPrintedTimes(barcode);
         }
     } else {
-        cout << "First step: \n Printing the Assembly Documents, and multiple Serial Number Lists \n";
+        cout << "First step: \nPrinting the BOM, Assembly Documents, Configuration Sheet, and multiple Serial Number Lists \n";
     }
     cout << "How many times would you like to print? [default = " << timesPrinting <<
-            " ]. \n [Enter] to continue with the default, otherwise submit a new number to change\n";
+            " ]. \n[Enter] to continue with the default, otherwise submit a new number to change\n";
     string input;
     cin.ignore();
     getline(cin, input);
@@ -426,19 +426,19 @@ void print075(int startingSN, int times) {
 void printStageTwoDocuments(string barcode, string serialNum, vector<string> documentType, vector<string> documentName) {
     // prints out all of the documents related to post production
     for (int i = 0; i < documentType.size(); i++) {
-        string reportName, parm1 = "", s, token;
+        string searchPath, reportName, s, token;
         vector<string> noteParts;
         istringstream iss(documentName[i]);
         // parses with ? as the delimiter, up to 3 parameters 
         while ( getline(iss, token, '?') ) { 
             noteParts.push_back(token);
         }
-        reportName = noteParts.at(0);
-        parm1 = noteParts.at(1);
+        searchPath = noteParts.at(0);
+        reportName = noteParts.at(1);
         if (documentType.at(i) == "Initial DOCS") {
-            s = "printWIPDocuments.bat " + reportName + " \"" + parm1 + "\""; 
+            s = "printWIPDocuments.bat \"" + searchPath + "\" " + reportName; 
         } else if (documentType.at(i) == "Final DOCS") {
-            s = "printSerialDocuments.bat " + barcode + " " + serialNum + " " + reportName + " \"" + parm1 + "\""; 
+            s = "printSerialDocuments.bat " + barcode + " " + serialNum + " \"" + searchPath + "\" " + reportName; 
         }
     }
 }
