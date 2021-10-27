@@ -1,8 +1,7 @@
 @echo off
 :: takes in a search path, and the document number 
-set searchPath=%1
-set searchPath=%searchPath:"=%
-set documentName=%2
+set searchPath=\\WATNAS\Production\Serial No Tracking
+set documentName=Serial_No_Tracking
 
 :: searchs for the document
 set foundFilePath=
@@ -39,3 +38,4 @@ GOTO :end
 :xlsx
 powershell -command "start-process -filepath '%foundFilePath%' -verb print"
 :end
+PAUSE

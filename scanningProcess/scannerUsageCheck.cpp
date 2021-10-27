@@ -26,11 +26,11 @@ int main(int argc, char* argv[]) {
     // allows the user to change the SQL query before the program starts
     cout << "Pixus Technologies Label Printer" << endl << "Confirm that this is your barcode: " << barcode << " [y]" << endl;
     cin >> trash;
-    if (trash != "y") {
+    if (trash != "y" && trash != "Y") {
         cout << "Closing..." << endl;
         string s = "removeSQLqueries.bat";
         system( s.c_str() );
-        Sleep(3000);
+        Sleep(2000);
         exit(1);
     }
     // checks if the barcode is in the database already
@@ -65,9 +65,11 @@ int main(int argc, char* argv[]) {
             // removes whitespace from begining or end
             inputProcesser.erase(inputProcesser.find_last_not_of(" \n\r\t")+1);
             inputProcesser.erase(0, inputProcesser.find_first_not_of(" \n\r\t"));
-            labelReports.push_back(inputProcesser);
+            // escape character
+            if (inputProcesser.substr(0,1) != "~") {
+                labelReports.push_back(inputProcesser);
+            }
             //cout << partNum << endl << timesOrderedTotal << endl << partNumAbove << endl << labelNames.back() << endl << labelReports.back() << endl;
-            //cout << "START" << labelReports.back() << "END" << endl;
         } 
         ordernum="";
     }
@@ -92,8 +94,12 @@ int main(int argc, char* argv[]) {
             //get rest for note
             int pos = fInput.find(inputProcesser) + inputProcesser.size() + 1;
             inputProcesser = fInput.substr(pos);
+            // removes whitespace from begining or end
             inputProcesser.erase(inputProcesser.find_last_not_of(" \n\r\t")+1);
-            documentReports.push_back(inputProcesser);
+            // escape character
+            if (inputProcesser.substr(0,1) != "~") {
+                documentReports.push_back(inputProcesser);            
+            }
         } 
         ordernum="";
     }
@@ -156,7 +162,7 @@ int main(int argc, char* argv[]) {
             cout << "There appears no labels with that shop order";
             string s = "removeSQLqueries.bat";
             system( s.c_str() );
-            Sleep(9000);
+            Sleep(5000);
             exit(1);
         }
 
@@ -178,8 +184,7 @@ int main(int argc, char* argv[]) {
         do {
             cout << "Reprint All, One, or None? (a/1/n)\n";
             cin >> yesno;
-            // reprints all of the documents/label
-            if (yesno == "a") {
+            if (yesno == "a" || yesno == "A") { // reprints all of the documents/label
                 for (int i = 0; i < timesPrinting; i++) {
                     int serialNum = startingSN + i;
                     printStageTwo(to_string(serialNum), barcode, labelReports, labelNames);
@@ -217,7 +222,7 @@ int main(int argc, char* argv[]) {
                         cout << "Do you want to print " << reportName << " report with label " << labelNames[j] << " with parameters: " + parm1 + " " + parm2 + " " + parm3 << " [y/n]" << endl;
                         
                         cin >> responce;
-                        if (responce == "y") {
+                        if (responce == "y" || responce == "Y") {
                             s = "printLabelsv2.bat " + barcode + " " + sn + " " + reportName + " " + labelNames[j] + " \"" + parm1 + "\" \"" + parm2 + "\" \"" + parm3 + "\"";
                             system( s.c_str() );
                         }
@@ -234,7 +239,7 @@ int main(int argc, char* argv[]) {
                         reportName = noteParts.at(1);
                         cout << "Do you want to print " << reportName << " report under path " << reportPath << " [y/n]" << endl;
                         cin >> responce;
-                        if (responce == "y" && documentType.at(i) == "Final DOCS") {
+                        if ((responce == "y" || responce == "Y") && documentType.at(i) == "Final DOCS") {
                             s = "printSerialDocuments.bat " + barcode + " " + sn + " \"" + reportPath + "\" " + reportName;
                             system( s.c_str() );
                         }
@@ -242,7 +247,7 @@ int main(int argc, char* argv[]) {
                 }
             }
             cout << "Finished printing\n";
-        } while (yesno != "n");
+        } while (yesno != "n" && yesno != "N");
         s = "removeSQLqueries.bat";
         system( s.c_str() );
     } else { // haven't seen the barcode before, so print BOM, config, SN list

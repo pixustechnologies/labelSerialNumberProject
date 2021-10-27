@@ -12,6 +12,7 @@ set printerName=\\waterp01\PXS - MXM363N PCL6
 echo Printing the Serial Number Lists
 :: the list of serial numbers
 if /i "%prtnum:~0,3%" == "02A" goto :assy
+if /i "%prtnum:~0,4%" == "K02A" goto :assy
 
 :: this is for normal parts
 "%exePath%" -e "%reportPath%SerialNumberList_v2.rpt" "Parm1:%orderNum%" "Export_Format:Printer (Specified)" "Export_File:%printerName%" "Print_Copies:%printNum%"
