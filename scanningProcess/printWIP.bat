@@ -7,7 +7,11 @@ set prtnumAbove=%4
 
 set exePath=C:\Program Files (x86)\Visual CUT 11\Visual CUT.exe
 set reportPath=\\WATDBS01\ExactShared\Shop Order Processing\
-set printerName=\\waterp01\PXS - MXM363N PCL6
+set printerName=\\waterp01\PXS-PRN-SHOP-BRTHR
+
+echo Printing the BOM
+:: the BOM
+"%exePath%" -e "%reportPath%BOMRPTv2.rpt" "Parm1:%prtnumAbove%" "Export_Format:Printer (Specified)" "Export_File:%printerName%" "Use_Saved_Data_Recent:2"
 
 echo Printing the Serial Number Lists
 :: the list of serial numbers
@@ -16,16 +20,12 @@ if /i "%prtnum:~0,4%" == "K02A" goto :assy
 
 :: this is for normal parts
 "%exePath%" -e "%reportPath%SerialNumberList_v2.rpt" "Parm1:%orderNum%" "Export_Format:Printer (Specified)" "Export_File:%printerName%" "Print_Copies:%printNum%"
-goto :bom
+goto :config
 
 :assy &:: this is for parts that are assemblys, which dont have a assembly number
 "%exePath%" -e "%reportPath%SerialNumberList_v3.rpt" "Parm1:%orderNum%" "Export_Format:Printer (Specified)" "Export_File:%printerName%" "Print_Copies:%printNum%"
 
-:bom
-echo Printing the BOM
-:: the BOM
-"%exePath%" -e "%reportPath%BOMRPTv2.rpt" "Parm1:%prtnumAbove%" "Export_Format:Printer (Specified)" "Export_File:%printerName%" "Use_Saved_Data_Recent:2"
-
+:config
 :: the configuration sheets
 :: searches for the correct file, then prints
 set searchPath="\\WATNAS\Userdata\Projects"

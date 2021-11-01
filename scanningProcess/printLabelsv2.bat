@@ -17,11 +17,10 @@ set searchPath=\\WATNAS\Production\Manufacturing Instructions\Crystal Label Repo
 set foundFilePath=
 FOR /R "%searchPath%" %%a  in (%reportName%*.rpt) DO (
     IF EXIST "%%~fa" (
-        echo "%%~fa" 
+        ::echo "%%~fa" 
         SET foundFilePath=%%~fa
     )
 )
-
 :: checks which printer to print to
 set printerName=
 :: PRINTER NAMES UNTESTED
