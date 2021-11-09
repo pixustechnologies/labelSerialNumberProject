@@ -66,10 +66,12 @@ int main(int argc, char* argv[]) {
             inputProcesser.erase(inputProcesser.find_last_not_of(" \n\r\t")+1);
             inputProcesser.erase(0, inputProcesser.find_first_not_of(" \n\r\t"));
             // escape character
-            if (inputProcesser.substr(0,1) != "~") {
+            if (inputProcesser.substr(0,1) == "~" || inputProcesser == "") {
+                labelNames.pop_back();
+            } else {
                 labelReports.push_back(inputProcesser);
+                //cout << partNum << endl << timesOrderedTotal << endl << partNumAbove << endl << labelNames.back() << endl << labelReports.back() << endl;
             }
-            //cout << partNum << endl << timesOrderedTotal << endl << partNumAbove << endl << labelNames.back() << endl << labelReports.back() << endl;
         } 
         ordernum="";
     }
@@ -97,8 +99,10 @@ int main(int argc, char* argv[]) {
             // removes whitespace from begining or end
             inputProcesser.erase(inputProcesser.find_last_not_of(" \n\r\t")+1);
             // escape character
-            if (inputProcesser.substr(0,1) != "~") {
-                documentReports.push_back(inputProcesser);            
+            if (inputProcesser.substr(0,1) == "~" || inputProcesser == "") {
+                documentType.pop_back();
+            } else {
+                documentReports.push_back(inputProcesser);
             }
         } 
         ordernum="";
