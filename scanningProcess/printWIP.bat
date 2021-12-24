@@ -50,7 +50,7 @@ if %foundCnt% == 1 (
 ) else (
     ::print menu
     for /l %%N in (1 1 %foundCnt%) do echo %%N - !foundFilePath%%N!
-    set /p selection="Enter a folder number: "
+    set /p selection="Enter a document number: "
     for /l %%N in (1 1 %foundCnt%) do if !selection! == %%N (call "C:\Program Files\Microsoft Office\root\Office16\WINWORD.EXE" /q /n "!foundFilePath%%N!" /mFilePrintDefault /mFileCloseOrExit /mFileExit )
 )
 
