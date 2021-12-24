@@ -29,20 +29,31 @@ goto :config
 :: the configuration sheets
 :: searches for the correct file, then prints
 set searchPath="\\WATNAS\Userdata\Projects"
-set foundFilePath=
 echo Searching for the Configuration Sheet...
+
+setlocal enableDelayedExpansion
+set foundCnt=0
 FOR /R "%searchPath%" %%a  in (%prtnum%*.docx) DO (
     IF EXIST "%%~fa" (
         echo "%%~fa" 
-        SET foundFilePath=%%~fa
+        set /a foundCnt +=1
+        SET "foundFilePath!foundCnt!=%%~fa"
     )
 )
-echo Printing "%foundFilePath%"
 echo Finished Searching
-if "%foundFilePath%" == "" (
+if %foundCnt% == 0 (
     goto :skip
 ) 
-call "C:\Program Files\Microsoft Office\root\Office16\WINWORD.EXE" /q /n "%foundFilePath%" /mFilePrintDefault /mFileCloseOrExit /mFileExit 
+if %foundCnt% == 1 (
+    echo Printing "%foundFilePath1%"
+    call "C:\Program Files\Microsoft Office\root\Office16\WINWORD.EXE" /q /n "%foundFilePath1%" /mFilePrintDefault /mFileCloseOrExit /mFileExit 
+) else (
+    ::print menu
+    for /l %%N in (1 1 %foundCnt%) do echo %%N - !foundFilePath%%N!
+    set /p selection="Enter a folder number: "
+    for /l %%N in (1 1 %foundCnt%) do if !selection! == %%N (call "C:\Program Files\Microsoft Office\root\Office16\WINWORD.EXE" /q /n "!foundFilePath%%N!" /mFilePrintDefault /mFileCloseOrExit /mFileExit )
+)
+
 :skip
 :: dialoge box to indicate it finished printing
 echo.
